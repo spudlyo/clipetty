@@ -2,9 +2,10 @@
 #+STARTUP: showeverything
 
 * Clipetty
-The whole point of Clipetty is to send text that you kill in Emacs to your
-Operating System's clipboard, and to do so when you're running Emacs in a
-terminal or "tty" frame.
+The whole point of Clipetty is to send text that you kill in Emacs to
+your Operating System's clipboard, and to do so when you're running
+Emacs in a terminal or "tty" frame. If you run Emacs in a GUI frame,
+you don't need Clipetty, as this will likely just work out of the box.
 
 ** Setup
 Setup is pretty easy! If you're using =use-package= you can add this to your
