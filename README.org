@@ -14,7 +14,8 @@ right out of the box.
 Setup is pretty easy! If you're using =use-package= you can add this to your
 =init.el= file:
 #+BEGIN_SRC elisp
-(use-package clipetty :config (clipetty-mode))
+(use-package clipetty
+ :config (clipetty-mode))
 #+END_SRC
 Otherwise if you installed =clipetty.el= somewhere on your =load-path= you can
 add:
