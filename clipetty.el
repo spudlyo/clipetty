@@ -9,7 +9,7 @@
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24.3") (use-package "2.4"))
 ;; Keywords: clipboard tty osc terminal
-;; URL: https://github.com/spudlyo/clippety
+;; URL: https://github.com/spudlyo/clipetty
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -128,20 +128,20 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
 
 ;;;###autoload
 (defun clipetty-toggle ()
-  "Toggle assignment of `clipety-cut' to the `interprogram-cut-function'."
-  (if (eq interprogram-cut-function #'clippety-cut)
+  "Toggle assignment of `clipetty-cut' to the `interprogram-cut-function'."
+  (if (eq interprogram-cut-function #'clipetty-cut)
       (setq interprogram-cut-function clipetty-original-icf)
     (setq clipetty-original-icf interprogram-cut-function)
-    (setq interprogram-cut-function #'clippety-cut)))
+    (setq interprogram-cut-function #'clipetty-cut)))
 
 ;;;###autoload
 (defun clipetty-kill-ring-save (beg end &optional region)
   "Enables Clipetty for this save, passes BEG END and optionally REGION.
 It can be annoying to have Clipetty overwrite your system
 clipboard every time you kill something.  This function wraps
-Clippety around the `kill-ring-save' function and can be invoked
+Clipetty around the `kill-ring-save' function and can be invoked
 explicitly."
-  (if (eq interprogram-cut-function #'clipety-cut)
+  (if (eq interprogram-cut-function #'clipetty-cut)
       (kill-ring-save beg end region)
     (clipetty-toggle)
     (kill-ring-save beg end region)
