@@ -44,27 +44,51 @@ tmux both locally and on remote hosts you SSH into."
   :type 'boolean
   :group 'clipetty)
 
-;; The maximum OSC 52 message is 10,000 bytes. This means we can support base64
-;; encoded strings of up to 74,994 bytes long.
-(defvar clipetty-max-cut 74994)
+(defcustom clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY"
+  "The command we send to tmux to determine the SSH_TTY.
+This default assumes that tmux is on your PATH.  If tmux lives
+elsewhere for you, or it is named something else, you can change
+it here."
+  :type 'string
+  :group 'clipetty)
+
+(defcustom clipetty-tmux-ssh-tty-regexp "SSH_TTY=\\([^[:space:]]+\\)"
+  "The regular expression used to capture the SSH_TTY from tmux.
+Unless you're inventing a new method of determining the SSH_TTY, it's
+unlikely you'll ever need to change this."
+  :type 'string
+  :group 'clipetty)
+
+(defconst clipetty-max-cut 74994
+  "The maximum length of a string you can send to the clipboard via OSC52.
+The max OSC 52 message is 10,000 bytes.  This means we can
+support base64 encoded strings of up to 74,994 bytes long.")
+
+(defvar clipetty-original-icf interprogram-cut-function
+  "Keep the original ICF to restore on clipetty-mode toggle.")
+
+(defun clipetty-get-tmux-ssh-tty ()
+  "Query tmux for its local SSH_TTY environment variable and return it.
+Return nil if tmux is unable to locate the environment variable"
+  (let (tmux-ssh-tty (shell-command-to-string clipetty-tmux-ssh-tty))
+    (if (string-match clipetty-tmux-ssh-tty-regexp tmux-ssh-tty)
+        (match-string 0 tmux-ssh-tty)
+      nil)))
 
 (defun clipetty-tty ()
   "Return which TTY we should send our OSC payload to."
-  (let ((ssh-tty (getenv "SSH_TTY" (selected-frame)))
-        (showenv "tmux show-environment SSH_TTY | cut -d'=' -f2 | tr -d '\n'"))
-    (if (not ssh-tty) (terminal-name)
+  (let ((ssh-tty (getenv "SSH_TTY" (selected-frame))))
+    (if (not ssh-tty)
+        (terminal-name)
       (if (getenv "TMUX" (selected-frame))
-          ;; If we're SSH'd into a host running tmux that means `$SSH_TTY' could
-          ;; very well be stale due to detach/re-attach. This workaround queries
-          ;; tmux itself, rather than the environment variable to get the
-          ;; current value of `SSH_TTY'. This requires you to add the following
-          ;; to your .tmux.conf:
-          ;;
-          ;;     set -ag update-environment "SSH_TTY"
-          ;;
-          ;; As far as I know, there exists no such workaround for GNU screen.
-          (shell-command-to-string showenv)
-        ssh-tty))))
+          ;; If we're SSH'd into a host running tmux that means
+          ;; `$SSH_TTY' could very well be stale due to
+          ;; detach/re-attach. This workaround queries tmux itself,
+          ;; rather than the environment variable to get the current
+          ;; value of `SSH_TTY'.
+          (let (tmux-ssh-tty (clipetty-get-tmux-ssh-tty))
+            (if tmux-ssh-tty tmux-ssh-tty ssh-tty)
+        ssh-tty)))))
 
 (defun clipetty-dcs-wrap (string)
   "Return STRING wrapped in an appropriate DCS if necessary."
@@ -89,6 +113,7 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
   (let ((bin (base64-encode-string (encode-coding-string string 'binary) t)))
     (concat "\e]52;c;" (if encode bin string) "\a")))
 
+;;;###autoload
 (defun clipetty-cut (string)
   "If in a terminal frame, convert STRING to a series of OSC 52 messages."
   (if (display-graphic-p)
@@ -101,17 +126,32 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
     (clipetty-emit (clipetty-osc "!"))
     (clipetty-emit (clipetty-osc string t))))
 
-(defun clipetty-init ()
-  "Initialize the `interprogram-cut-function'."
-  (interactive)
-  (setq interprogram-cut-function 'clipetty-cut))
+;;;###autoload
+(defun clipetty-toggle ()
+  "Toggle assignment of `clipety-cut' to the `interprogram-cut-function'."
+  (if (eq interprogram-cut-function #'clippety-cut)
+      (setq interprogram-cut-function clipetty-original-icf)
+    (setq clipetty-original-icf interprogram-cut-function)
+    (setq interprogram-cut-function #'clippety-cut)))
 
+;;;###autoload
 (defun clipetty-kill-ring-save (beg end &optional region)
-  "Enables clipetty for this save, passes BEG END and optionally REGION."
-  (let (old-interprogram-cut-function interprogram-cut-function)
-    (setq interprogram-cut-function 'clipetty-cut)
+  "Enables Clipetty for this save, passes BEG END and optionally REGION.
+It can be annoying to have Clipetty overwrite your system
+clipboard every time you kill something.  This function wraps
+Clippety around the `kill-ring-save' function and can be invoked
+explicitly."
+  (if (eq interprogram-cut-function #'clipety-cut)
+      (kill-ring-save beg end region)
+    (clipetty-toggle)
     (kill-ring-save beg end region)
-    (setq interprogram-cut-function 'old-iinterprogram-cut-function)))
+    (clipetty-toggle)))
+
+(define-minor-mode clipetty-mode
+  "Send every kill to your Operating System's Clipboard."
+  :lighter " CLP"
+  :global
+  (clipetty-toggle))
 
 (provide 'clipetty)
 
