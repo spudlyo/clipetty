@@ -1,0 +1,88 @@
+#+TITLE: Clipetty Readme
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+
+* Clipetty
+The whole point of Clipetty is to send text that you kill in Emacs to your
+Operating System's clipboard, and to do so when you're running Emacs in a
+terminal or "tty" frame.
+
+** Setup
+Setup is pretty easy! If you're using =use-package= you can add this to your
+=init.el= file:
+#+BEGIN_SRC elisp
+(use-package clipetty
+  :config (clipetty-init))
+#+END_SRC
+Otherwise if you installed =clipetty.el= somewhere on your =load-path= you can
+add:
+#+BEGIN_SRC elisp
+(require 'clipetty)
+(clipetty-init) 
+#+END_SRC
+
+** How Clipetty works
+Clipetty does its magic by assigning the =clipetty-cut= function to Emacs'
+=interprogram-cut-function= variable, which is what happens when you call
+=clipetty-init=. After initialization, every time you kill a line or region this
+function gets called with a STRING variable that contains the content that is
+destined for the kill ring. The =clipetty-cut= function takes this string,
+converts it to base64, wraps it in an [[https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences][ANSI OSC]] 52 escape sequence, and then
+sends it to your terminal. Terminal programs which support OSC commands will
+interpret this as an invitation to strip off the escape sequence, decode the
+base64, and then insert the resulting string into the system clipboard.
+
+** Terminal Programs that Support OSC Clipboard Operations
+- [[https://iterm2.com][iTerm2]] (macOS)
+- [[https://github.com/jwilm/alacritty][Alacritty]] (macOS, Linux, BSD, WIndows)
+- [[https://sw.kovidgoyal.net/kitty/][kitty]] (macOS, Linux)
+- [[https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt][xterm]] (Unix)
+- [[https://mintty.github.io/][mintty]] (Windows)
+- [[https://hterm.org][hterm]] (Javascript)
+This is not an exhaustive list, these are just the ones I know about. Submit a
+PR if you know of any I missed. The OSC 52 technique of updating the system
+clipboard originated with =xterm=. The =kitty= terminal also gets honorable
+mention for extending the =xterm= protocol to [[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]].
+
+** Clipetty and Terminal Multiplexers
+If you're running Emacs under a terminal multiplexer like =tmux= or =screen=,
+these programs will intercept these ANSI OSC 52 escape sequences, and if they
+don't think your terminal supports OSC 52 (i.e. you don't have a very specific
+=terminfo(5)= capability) they'll not pass them on to your outer terminal. With
+enough tweaking you can prevent =tmux= from doing this, but it can be a
+challenge. Running Emacs on a remote host with nested terminal multiplexers
+(something I often do) can further complicate things.
+
+Clipetty attempts to deal with the problem of the terminal multiplexer
+intercepting the ANSI OSC 52 escape sequence by looking for environment
+variables that indicate one is in use and wrapping the OSC 52 escape sequence in
+a "Device Control String" (DCS). This presence of a DCS tells =tmux= or =screen=
+to unwrap the message and send it along unmolested, where it can be interpreted
+by the outer terminal. Clipetty handles the case of nested terminal multiplexers
+by writing the DCS wrapped OSC 52 escape sequence directly to your =$SSH_TTY=
+thereby bypassing the terminal multiplexer on the remote host entirely.
+
+*** Dealing With a Stale SSH_TTY Environment Variable
+Let's say you SSH into a host, start =tmux=, and then run Emacs. A little later
+you detach your session and log out. You then SSH back into the same host, and
+re-attach your session. Your Emacs process is still running right where you left
+it, but the =$SSH_TTY= environment variable it inherited from the shell is now
+stale (or longer accurate) as it still points to your /old/ SSH tty. This means
+that Clipetty will no longer function in =tmux= windows that were created during
+your previous login until you manually update the =$SSH_TTY= environment
+variable.
+
+Thankfully in =tmux= there is an easy way of dealing with this problem, you can
+add the following to your =.tmux.conf= file:
+#+BEGIN_SRC 
+set -ag update-environment "SSH_TTY"
+#+END_SRC
+This will tell =tmux= to update its local =$SSH_TTY= environment variable when
+you re-attach, and Clipetty will ask =tmux= about it rather than relying on the
+(possibly stale) variable that Emacs inherited from the shell.
+
+** Acknowledgements
+This code was inspired by =osc52.el= by the Chromium OS Authors, which was very
+helpful in showing me how this could be done, but lacked support for =tmux= and
+nested terminal multiplexers. I'd also like to thank Suraj N. Kurapati, as I
+learned a lot by studying his shell script =yank=.
