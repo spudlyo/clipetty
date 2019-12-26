@@ -1,4 +1,3 @@
-#+TITLE: Clipetty Readme
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
 
