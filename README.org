@@ -2,35 +2,37 @@
 #+STARTUP: showeverything
 
 * Clipetty
-The whole point of Clipetty is to send text that you kill in Emacs to
-your Operating System's clipboard, and to do so when you're running
-Emacs in a terminal or "tty" frame. If you run Emacs in a GUI frame,
-you don't need Clipetty, as this will likely just work out of the box.
+Clipetty is an minor mode that sends text that you kill in Emacs to your
+Operating System's clipboard, and specifically does so when you're running
+Emacs in a terminal or "tty" frame.
+
+If you always run Emacs in a GUI frame, you don't need Clipetty, as this
+Operating System clipboard integration is likely working for you in GUI frames
+right out of the box.
 
 ** Setup
 Setup is pretty easy! If you're using =use-package= you can add this to your
 =init.el= file:
 #+BEGIN_SRC elisp
-(use-package clipetty
-  :config (clipetty-init))
+(use-package clipetty :config (clipetty-mode))
 #+END_SRC
 Otherwise if you installed =clipetty.el= somewhere on your =load-path= you can
 add:
 #+BEGIN_SRC elisp
 (require 'clipetty)
-(clipetty-init) 
+(clipetty-mode) 
 #+END_SRC
 
 ** How Clipetty works
 Clipetty does its magic by assigning the =clipetty-cut= function to Emacs'
-=interprogram-cut-function= variable, which is what happens when you call
-=clipetty-init=. After initialization, every time you kill a line or region this
-function gets called with a STRING variable that contains the content that is
-destined for the kill ring. The =clipetty-cut= function takes this string,
-converts it to base64, wraps it in an [[https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences][ANSI OSC]] 52 escape sequence, and then
-sends it to your terminal. Terminal programs which support OSC commands will
-interpret this as an invitation to strip off the escape sequence, decode the
-base64, and then insert the resulting string into the system clipboard.
+=interprogram-cut-function= variable, which is what happens when you activate
+=clipetty-mode=. When the mode is active, every time you kill a line or region
+the Clipety gets sent the content that is destined for the kill ring. The
+=clipetty-cut= function takes this content, converts it to base64, wraps it in
+an [[https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences][ANSI OSC]] 52 escape sequence, and then sends it to your terminal. Terminal
+programs which support OSC 52 commands will react to this by stripping off the
+escape sequence, decoding the base64 content, and then inserting the resulting
+string into the system clipboard.
 
 ** Terminal Programs that Support OSC Clipboard Operations
 - [[https://iterm2.com][iTerm2]] (macOS)
