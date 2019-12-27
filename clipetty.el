@@ -7,8 +7,8 @@
 ;; Created: 25 Dec 2019
 ;; Modified: 25 Dec 2029
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24.3"))
-;; Keywords: clipboard tty osc52 osc terminal
+;; Package-Requires: ((emacs "25.1"))
+;; Keywords: terminals convenience
 ;; URL: https://github.com/spudlyo/clipetty
 
 ;; This program is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ The max OSC 52 message is 10,000 bytes.  This means we can
 support base64 encoded strings of up to 74,994 bytes long.")
 
 (defvar clipetty-original-icf interprogram-cut-function
-  "Keep the original ICF to restore on clipetty-mode toggle.")
+  "Keep the original ICF to restore on `clipetty-toggle' function.")
 
 (defun clipetty-get-tmux-ssh-tty ()
   "Query tmux for its local SSH_TTY environment variable and return it.
