@@ -41,31 +41,6 @@ If you manually installed `clipetty.el` somewhere on your `load-path` you can ad
 ```
 
 
-## Customize
-
-You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customization Interface or you can manually set the following variables in your `init.el`:
-
-
-<a id="nested"></a>
-
-### `clipetty-assume-nested-mux`
-
-This variable, when set to a non-nill value, tells Clipetty to assume that if you're running a terminal mulitplexer on a remote host that it's nested &#x2013; that is to say that you're also running the same terminal multiplexer on the local host.
-
-```
-(setq clipetty-assume-nested-mux nil)
-```
-
-
-### `clipetty-tmux-ssh-tty`
-
-This variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here."
-
-```
-(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
-```
-
-
 ## How Clipetty works
 
 Clipetty does its magic by assigning the `clipetty-cut` function to Emacs' `interprogram-cut-function` variable, which is what happens when you activate `clipetty-mode`. When the mode is active, every time you kill a line or region Clipetty gets sent the content that is destined for the kill ring. The `clipetty-cut` function takes this content, converts it to base64, wraps it in an [ANSI OSC](https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences) 52 escape sequence, and then sends it to your terminal. Terminal programs which support OSC 52 commands will react to this by stripping off the escape sequence, decoding the base64 content, and then inserting the resulting string into the system clipboard.
@@ -112,6 +87,31 @@ set -ag update-environment "SSH_TTY"
 ```
 
 This will tell `tmux` to update its local `$SSH_TTY` environment variable when you re-attach, and Clipetty will ask `tmux` about it rather than relying on the (possibly stale) variable that Emacs inherited from the shell.
+
+
+## Customization
+
+You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customization Interface or you can manually set the following variables in your `init.el`:
+
+
+<a id="nested"></a>
+
+### Configuring multiplexer nesting
+
+The `clipetty-assume-nested-mux` variable, when set to a non-nill value, tells Clipetty to assume that if you're running a terminal mulitplexer on a remote host that it's nested &#x2013; that is to say that you're also running the *same* terminal multiplexer on the local host.
+
+```
+(setq clipetty-assume-nested-mux nil)
+```
+
+
+### Configuring Tmux integration
+
+The `clipetty-tmux-ssh-tty` variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here.
+
+```
+(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
+```
 
 
 ## Acknowledgements
