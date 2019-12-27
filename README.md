@@ -1,13 +1,10 @@
 # Clipetty
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-
-# Introduction
-
 Clipetty is an minor mode that sends text that you kill in Emacs to your Operating System's clipboard, and specifically does so when you're running Emacs in a terminal (TTY) frame. For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences, see the [Terminals](#terminals) section below to see if your favorite terminal emulator is on the list.
 
 
-## Features
+# Features
 
 -   Works both locally and on remote hosts via SSH
 -   Supports emacsclient with a mix of GUI and TTY frames
