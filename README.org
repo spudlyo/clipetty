@@ -1,30 +1,68 @@
-#+OPTIONS: toc:nil
+#+TITLE: Clipetty
 #+STARTUP: showeverything
 
-* Clipetty
+* Introduction
 Clipetty is an minor mode that sends text that you kill in Emacs to your
-Operating System's clipboard, and specifically does so when you're running
-Emacs in a terminal or "tty" frame.
+Operating System's clipboard, and specifically does so when you're running Emacs
+in a terminal (TTY) frame. For this to work you need to be using a terminal
+emulator that supports OSC 52 escape sequences, see the [[#terminals][Terminals]] section below
+to see if your favorite terminal emulator is on the list.
 
-If you always run Emacs in a GUI frame, you don't need Clipetty, as this
-Operating System clipboard integration is likely working for you in GUI frames
-right out of the box.
+** Features
+- Works both locally and on remote hosts via SSH
+- Supports emacsclient with a mix of GUI and TTY frames
+- Works when running Emacs under GNU Screen or Tmux
+- Supports [[nested][nested GNU Screen or Tmux sessions]]
+- [[kitty][Compatible]] with the Kitty terminal emulator
+- Allows for [[#stale][seamless detach/re-attach with Tmux]]
 
-** Setup
-Setup is pretty easy! If you're using =use-package= you can add this to your
-=init.el= file:
+* Install
+Setup is pretty easy, typically you won't need to configure anything to get
+started.
+** Use-package
+If you're using =use-package= you can add this to your =init.el= file:
 #+BEGIN_SRC elisp
 (use-package clipetty
- :config (clipetty-mode))
+  :ensure t
+  :hook (after-init . clipetty-mode))
 #+END_SRC
-Otherwise if you installed =clipetty.el= somewhere on your =load-path= you can
+** Manual
+If you manually installed =clipetty.el= somewhere on your =load-path= you can
 add:
 #+BEGIN_SRC elisp
 (require 'clipetty)
-(clipetty-mode) 
+(clipetty-mode 1) 
 #+END_SRC
 
-** How Clipetty works
+* Customize
+You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
+Customization Interface or you can manually set the following variables in your
+=init.el=:
+
+** =clipetty-assume-nested-mux=
+:PROPERTIES:
+:CUSTOM_ID: nested
+:END:
+This variable, when set to a non-nill value, tells Clipetty to assume that if
+you're running a terminal mulitplexer on a remote host that it's nested -- that
+is to say that you're also running the same terminal multiplexer on the local
+host.
+
+#+BEGIN_SRC elisp
+(setq clipetty-assume-nested-mux nil)
+#+END_SRC
+
+** =clipetty-tmux-ssh-tty=
+This variable tells Clipetty how to run =tmux= to query it's local SSH_TTY
+environment variable. This default assumes that =tmux= is on your PATH.  If
+=tmux= lives elsewhere for you, or it is named something else, you can change it
+here."
+
+#+BEGIN_SRC elisp
+(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
+#+END_SRC
+
+* How Clipetty works
 Clipetty does its magic by assigning the =clipetty-cut= function to Emacs'
 =interprogram-cut-function= variable, which is what happens when you activate
 =clipetty-mode=. When the mode is active, every time you kill a line or region
@@ -35,7 +73,10 @@ programs which support OSC 52 commands will react to this by stripping off the
 escape sequence, decoding the base64 content, and then inserting the resulting
 string into the system clipboard.
 
-** Terminal Programs that Support OSC Clipboard Operations
+* Terminals that Support OSC Clipboard Operations
+:PROPERTIES:
+:CUSTOM_ID: terminals
+:END:
 - [[https://iterm2.com][iTerm2]] (macOS)
 - [[https://github.com/jwilm/alacritty][Alacritty]] (macOS, Linux, BSD, WIndows)
 - [[https://sw.kovidgoyal.net/kitty/][kitty]] (macOS, Linux)
@@ -43,16 +84,22 @@ string into the system clipboard.
 - [[https://mintty.github.io/][mintty]] (Windows)
 - [[https://hterm.org][hterm]] (Javascript)
 This is not an exhaustive list, these are just the ones I know about. Submit a
-PR if you know of any I missed. The OSC 52 technique of updating the system
-clipboard originated with =xterm=. The =kitty= terminal also gets honorable
-mention for extending the =xterm= protocol to [[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]].
+PR if you know of any I missed.
 
-** Clipetty and Terminal Multiplexers
+** Kitty
+:PROPERTIES:
+:CUSTOM_ID: kitty
+:END:
+The =kitty= terminal gets honorable mention for extending the =xterm= protocol
+to [[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]]. While Clipetty at this time does not support
+Kitty's larger clipboard, it is compatible.
+
+* Clipetty and Terminal Multiplexers
 If you're running Emacs under a terminal multiplexer like =tmux= or =screen=,
 these programs will intercept these ANSI OSC 52 escape sequences, and if they
 don't think your terminal supports OSC 52 (i.e. you don't have a very specific
 =terminfo(5)= capability) they'll not pass them on to your outer terminal. With
-enough tweaking you can prevent =tmux= from doing this, but it can be a
+enough tweaking you can prevent them from doing this, but it can be a
 challenge. Running Emacs on a remote host with nested terminal multiplexers
 (something I often do) can further complicate things.
 
@@ -65,7 +112,10 @@ terminal multiplexers by writing the DCS wrapped OSC 52 escape sequence directly
 to your =$SSH_TTY= thereby bypassing the terminal multiplexer on the remote host
 entirely.
 
-*** Dealing With a Stale SSH_TTY Environment Variable
+** Dealing With a Stale SSH_TTY Environment Variable
+:PROPERTIES:
+:CUSTOM_ID: stale
+:END:
 Let's say you SSH into a host, start =tmux=, and then run Emacs. A little later
 you detach your session and log out. You then SSH back into the same host, and
 re-attach your session. Your Emacs process is still running right where you left
@@ -84,7 +134,7 @@ This will tell =tmux= to update its local =$SSH_TTY= environment variable when
 you re-attach, and Clipetty will ask =tmux= about it rather than relying on the
 (possibly stale) variable that Emacs inherited from the shell.
 
-** Acknowledgements
+* Acknowledgements
 This code was inspired by =osc52.el= by the Chromium OS Authors, which was very
 helpful in showing me how this could be done, but lacked support for =tmux= and
 nested terminal multiplexers. I'd also like to thank Suraj N. Kurapati, as I
