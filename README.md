@@ -44,21 +44,25 @@ If you manually installed `clipetty.el` somewhere on your `load-path` you can ad
 
 You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customization Interface or you can manually set the following variables in your `init.el`:
 
--   `clipetty-assume-nested-mux`
 
-    This variable, when set to a non-nill value, tells Clipetty to assume that if you're running a terminal mulitplexer on a remote host that it's nested &#x2013; that is to say that you're also running the same terminal multiplexer on the local host.
-    
-    ```
-    (setq clipetty-assume-nested-mux nil)
-    ```
+<a id="nested"></a>
 
--   `clipetty-tmux-ssh-tty`
+### `clipetty-assume-nested-mux`
 
-    This variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here."
-    
-    ```
-    (setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
-    ```
+This variable, when set to a non-nill value, tells Clipetty to assume that if you're running a terminal mulitplexer on a remote host that it's nested &#x2013; that is to say that you're also running the same terminal multiplexer on the local host.
+
+```
+(setq clipetty-assume-nested-mux nil)
+```
+
+
+### `clipetty-tmux-ssh-tty`
+
+This variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here."
+
+```
+(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
+```
 
 
 # How Clipetty works
