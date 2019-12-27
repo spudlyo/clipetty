@@ -1,10 +1,11 @@
 #+TITLE: Clipetty
+#+OPTIONS: toc:nil
 #+STARTUP: showeverything
+
 #+BEGIN_EXPORT md
 # Clipetty
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-**Table of Contents**
 #+END_EXPORT
 
 * Introduction
@@ -25,17 +26,19 @@ to see if your favorite terminal emulator is on the list.
 * Install
 Setup is pretty easy, typically you won't need to configure anything to get
 started.
+
 ** Use-package
 If you're using =use-package= you can add this to your =init.el= file:
-#+BEGIN_SRC elisp
+#+BEGIN_SRC
 (use-package clipetty
   :ensure t
   :hook (after-init . clipetty-mode))
 #+END_SRC
+
 ** Manual
 If you manually installed =clipetty.el= somewhere on your =load-path= you can
 add:
-#+BEGIN_SRC elisp
+#+BEGIN_SRC
 (require 'clipetty)
 (clipetty-mode 1) 
 #+END_SRC
@@ -45,7 +48,7 @@ You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
 Customization Interface or you can manually set the following variables in your
 =init.el=:
 
-** =clipetty-assume-nested-mux=
+*** =clipetty-assume-nested-mux=
 :PROPERTIES:
 :CUSTOM_ID: nested
 :END:
@@ -54,17 +57,17 @@ you're running a terminal mulitplexer on a remote host that it's nested -- that
 is to say that you're also running the same terminal multiplexer on the local
 host.
 
-#+BEGIN_SRC elisp
+#+BEGIN_SRC
 (setq clipetty-assume-nested-mux nil)
 #+END_SRC
 
-** =clipetty-tmux-ssh-tty=
+*** =clipetty-tmux-ssh-tty=
 This variable tells Clipetty how to run =tmux= to query it's local =SSH_TTY=
 environment variable. This default assumes that =tmux= is on your PATH.  If
 =tmux= lives elsewhere for you, or it is named something else, you can change it
 here."
 
-#+BEGIN_SRC elisp
+#+BEGIN_SRC
 (setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
 #+END_SRC
 
