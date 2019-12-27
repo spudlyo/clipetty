@@ -48,7 +48,7 @@ You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
 Customization Interface or you can manually set the following variables in your
 =init.el=:
 
-*** =clipetty-assume-nested-mux=
+**** =clipetty-assume-nested-mux=
 :PROPERTIES:
 :CUSTOM_ID: nested
 :END:
@@ -61,7 +61,7 @@ host.
 (setq clipetty-assume-nested-mux nil)
 #+END_SRC
 
-*** =clipetty-tmux-ssh-tty=
+**** =clipetty-tmux-ssh-tty=
 This variable tells Clipetty how to run =tmux= to query it's local =SSH_TTY=
 environment variable. This default assumes that =tmux= is on your PATH.  If
 =tmux= lives elsewhere for you, or it is named something else, you can change it
