@@ -1,28 +1,32 @@
-- [Introduction](#org17e55a3)
-  - [Features](#orgaf06ae3)
-- [Install](#org30226b6)
-  - [Use-package](#orgf22929a)
-  - [Manual](#orgccaa38f)
-- [Customize](#orgfa289de)
+- [Introduction](#orgc48b65a)
+  - [Features](#org991ae38)
+- [Install](#orgf8e17f4)
+  - [Use-package](#org3e1dc08)
+  - [Manual](#orgc376953)
+- [Customize](#org04cd607)
   - [`clipetty-assume-nested-mux`](#nested)
-  - [`clipetty-tmux-ssh-tty`](#org7a9939d)
-- [How Clipetty works](#org41ba450)
+  - [`clipetty-tmux-ssh-tty`](#org0abaf11)
+- [How Clipetty works](#orgd1051be)
 - [Terminals that Support OSC Clipboard Operations](#terminals)
   - [Kitty](#kitty)
-- [Clipetty and Terminal Multiplexers](#org3508283)
-  - [Dealing With a Stale SSH<sub>TTY</sub> Environment Variable](#stale)
-- [Acknowledgements](#org7fb6089)
+- [Clipetty and Terminal Multiplexers](#orgf09157d)
+  - [Dealing With a Stale `SSH_TTY` Environment Variable](#stale)
+- [Acknowledgements](#org706fef8)
+
+# Clipetty
+[![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
+
+**Table of Contents**
 
 
-
-<a id="org17e55a3"></a>
+<a id="orgc48b65a"></a>
 
 # Introduction
 
 Clipetty is an minor mode that sends text that you kill in Emacs to your Operating System's clipboard, and specifically does so when you're running Emacs in a terminal (TTY) frame. For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences, see the [Terminals](#terminals) section below to see if your favorite terminal emulator is on the list.
 
 
-<a id="orgaf06ae3"></a>
+<a id="org991ae38"></a>
 
 ## Features
 
@@ -34,14 +38,14 @@ Clipetty is an minor mode that sends text that you kill in Emacs to your Operati
 -   Allows for [seamless detach/re-attach with Tmux](#stale)
 
 
-<a id="org30226b6"></a>
+<a id="orgf8e17f4"></a>
 
 # Install
 
 Setup is pretty easy, typically you won't need to configure anything to get started.
 
 
-<a id="orgf22929a"></a>
+<a id="org3e1dc08"></a>
 
 ## Use-package
 
@@ -56,7 +60,7 @@ If you're using `use-package` you can add this to your `init.el` file:
     ""
 
 
-<a id="orgccaa38f"></a>
+<a id="orgc376953"></a>
 
 ## Manual
 
@@ -70,7 +74,7 @@ If you manually installed `clipetty.el` somewhere on your `load-path` you can ad
     ""
 
 
-<a id="orgfa289de"></a>
+<a id="org04cd607"></a>
 
 # Customize
 
@@ -90,11 +94,11 @@ This variable, when set to a non-nill value, tells Clipetty to assume that if yo
     ""
 
 
-<a id="org7a9939d"></a>
+<a id="org0abaf11"></a>
 
 ## `clipetty-tmux-ssh-tty`
 
-This variable tells Clipetty how to run `tmux` to query it's local SSH<sub>TTY</sub> environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here."
+This variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here."
 
 ```elisp
 (setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
@@ -103,7 +107,7 @@ This variable tells Clipetty how to run `tmux` to query it's local SSH<sub>TTY</
     ""
 
 
-<a id="org41ba450"></a>
+<a id="orgd1051be"></a>
 
 # How Clipetty works
 
@@ -131,7 +135,7 @@ This is not an exhaustive list, these are just the ones I know about. Submit a P
 The `kitty` terminal gets honorable mention for extending the `xterm` protocol to [support larger clipboards](https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard). While Clipetty at this time does not support Kitty's larger clipboard, it is compatible.
 
 
-<a id="org3508283"></a>
+<a id="orgf09157d"></a>
 
 # Clipetty and Terminal Multiplexers
 
@@ -142,7 +146,7 @@ Clipetty attempts to deal with this problem by looking for environment variables
 
 <a id="stale"></a>
 
-## Dealing With a Stale SSH<sub>TTY</sub> Environment Variable
+## Dealing With a Stale `SSH_TTY` Environment Variable
 
 Let's say you SSH into a host, start `tmux`, and then run Emacs. A little later you detach your session and log out. You then SSH back into the same host, and re-attach your session. Your Emacs process is still running right where you left it, but the `$SSH_TTY` environment variable it inherited from the shell is now stale (or longer accurate) as it still points to your *old* SSH tty. This means that Clipetty will no longer function in `tmux` windows that were created during your previous login until you manually update the `$SSH_TTY` environment variable.
 
@@ -155,7 +159,7 @@ set -ag update-environment "SSH_TTY"
 This will tell `tmux` to update its local `$SSH_TTY` environment variable when you re-attach, and Clipetty will ask `tmux` about it rather than relying on the (possibly stale) variable that Emacs inherited from the shell.
 
 
-<a id="org7fb6089"></a>
+<a id="org706fef8"></a>
 
 # Acknowledgements
 
