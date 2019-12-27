@@ -7,7 +7,7 @@
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 #+END_EXPORT
 Clipetty is a minor mode for terminal (TTY) Emacs users that sends text that
-you kill in Emacs to your Operating System's clipboard.
+you kill to your Operating System's clipboard.
 
 For this to work you need to be using a terminal emulator that supports OSC 52
 escape sequences. See the [[#terminals][Terminals]] section below to check if your favorite
