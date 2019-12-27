@@ -7,8 +7,8 @@
 ;; Created: 25 Dec 2019
 ;; Modified: 25 Dec 2029
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24.3") (use-package "2.4"))
-;; Keywords: clipboard tty osc terminal
+;; Package-Requires: ((emacs "24.3"))
+;; Keywords: clipboard tty osc52 osc terminal
 ;; URL: https://github.com/spudlyo/clipetty
 
 ;; This program is free software; you can redistribute it and/or
@@ -28,15 +28,16 @@
 
 ;;; Commentary:
 
-;; Sends ANSI "Operating System Command" (OSC) 52 escape sequences, and
-;; attempts to wrap these sequences in a correctly flavored "Device Control
-;; String" (DCS) where appropriate.
+;; Sends ANSI "Operating System Command" (OSC) 52 escape sequences,
+;; and to integrate with terminal multiplexers, attempts to wrap these
+;; sequences in a correctly flavored "Device Control String" (DCS)
+;; when appropriate.
 ;;
 ;; Please see README.org from the same repository for documentation.
 
 ;;; Code:
 
-(defcustom clipetty-assume-nested-mux t
+(defcustom clipetty-assume-nested-mux nil
   "Non-nil means if we detect a remote multiplexer, we assume it's nested.
 Nesting is the practice of running a terminal multiplexer inside
 a terminal multiplexer, which is what you'd be doing if you ran
@@ -149,7 +150,7 @@ explicitly."
 
 (define-minor-mode clipetty-mode
   "Send every kill to your Operating System's Clipboard."
-  :lighter " CLP"
+  :lighter " clptty"
   :global
   (clipetty-toggle))
 
