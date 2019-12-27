@@ -1,11 +1,11 @@
-;;; clipetty.el --- Manipulate the system (clip)board with (e)macs from a (TTY)
+;;; clipetty.el --- Kill to the system clipboard from a TTY frame -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019 Mike Hamrick
 
 ;; Author: Mike Hamrick <mikeh@muppetlabs.com>
 ;; Maintainer: Mike Hamrick <mikeh@muppetlabs.com>
 ;; Created: 25 Dec 2019
-;; Modified: 25 Dec 2029
+;; Modified: 27 Dec 2029
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: terminals convenience
@@ -29,10 +29,9 @@
 ;;; Commentary:
 
 ;; Sends ANSI "Operating System Command" (OSC) 52 escape sequences,
-;; and to integrate with terminal multiplexers, attempts to wrap these
-;; sequences in a correctly flavored "Device Control String" (DCS)
-;; when appropriate.
-;;
+;; to manipulate the Operating System's Clipboard from an Emacs TTY
+;; frame.  For use with the `interprogram-cut-function' variable.
+
 ;; Please see README.org from the same repository for documentation.
 
 ;;; Code:
