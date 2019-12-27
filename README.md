@@ -2,7 +2,7 @@
 
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-Clipetty is a minor mode for terminal (TTY) Emacs users that sends text that you kill to your Operating System's clipboard.
+Clipetty is a minor mode for terminal (TTY) users that sends text that you kill in Emacs to your Operating System's clipboard. If you predominately use Emacs in GUI (X-Windows, macOS, Windows) frames you don't need Clipetty.
 
 For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences. See the [Terminals](#terminals) section below to check if your favorite terminal emulator is on the list.
 
