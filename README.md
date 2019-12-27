@@ -2,7 +2,7 @@
 
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-Clipetty is an minor mode that sends text that you kill in Emacs to your Operating System's clipboard, and specifically does so when you're running Emacs in a terminal (TTY) frame. For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences, see the [Terminals](#terminals) section below to see if your favorite terminal emulator is on the list.
+Clipetty is an minor mode that sends text that you kill in Emacs to your Operating System's clipboard, and specifically does so when you're running Emacs in a terminal (TTY) frame. For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences. See the [Terminals](#terminals) section below to check if your favorite terminal emulator is on the list. If you predominately run Emacs in GUI (X-Windows, macOS, Windows) frames you don't need Clipetty.
 
 
 ## Features
@@ -80,7 +80,7 @@ Clipetty attempts to deal with this problem by looking for environment variables
 
 Let's say you SSH into a host, start `tmux`, and then run Emacs. A little later you detach your session and log out. You then SSH back into the same host, and re-attach your session. Your Emacs process is still running right where you left it, but the `$SSH_TTY` environment variable it inherited from the shell is now stale (or longer accurate) as it still points to your *old* SSH tty. This means that Clipetty will no longer function in `tmux` windows that were created during your previous login until you manually update the `$SSH_TTY` environment variable.
 
-Thankfully in `tmux` there is an easy way of dealing with this problem, you can add the following to your `.tmux.conf` file:
+Thankfully in `tmux` there is an easy way of dealing with this problem! Add the following to your `.tmux.conf` file:
 
 ```
 set -ag update-environment "SSH_TTY"
@@ -96,7 +96,7 @@ You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customizat
 
 <a id="nested"></a>
 
-### Configuring multiplexer nesting
+### Configuring Multiplexer Nesting
 
 The `clipetty-assume-nested-mux` variable, when set to a non-nill value, tells Clipetty to assume that if you're running a terminal mulitplexer on a remote host that it's nested &#x2013; that is to say that you're also running the *same* terminal multiplexer on the local host.
 
@@ -105,7 +105,7 @@ The `clipetty-assume-nested-mux` variable, when set to a non-nill value, tells C
 ```
 
 
-### Configuring Tmux integration
+### Configuring Tmux Integration
 
 The `clipetty-tmux-ssh-tty` variable tells Clipetty how to run `tmux` to query it's local `SSH_TTY` environment variable. This default assumes that `tmux` is on your PATH. If `tmux` lives elsewhere for you, or it is named something else, you can change it here.
 

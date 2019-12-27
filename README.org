@@ -9,8 +9,9 @@
 Clipetty is an minor mode that sends text that you kill in Emacs to your
 Operating System's clipboard, and specifically does so when you're running Emacs
 in a terminal (TTY) frame. For this to work you need to be using a terminal
-emulator that supports OSC 52 escape sequences, see the [[#terminals][Terminals]] section below
-to see if your favorite terminal emulator is on the list.
+emulator that supports OSC 52 escape sequences. See the [[#terminals][Terminals]] section below
+to check if your favorite terminal emulator is on the list. If you predominately
+run Emacs in GUI (X-Windows, macOS, Windows) frames you don't need Clipetty.
 
 ** Features
 - Works both locally and on remote hosts via SSH
@@ -103,8 +104,8 @@ that Clipetty will no longer function in =tmux= windows that were created during
 your previous login until you manually update the =$SSH_TTY= environment
 variable.
 
-Thankfully in =tmux= there is an easy way of dealing with this problem, you can
-add the following to your =.tmux.conf= file:
+Thankfully in =tmux= there is an easy way of dealing with this problem! Add the
+following to your =.tmux.conf= file:
 #+BEGIN_SRC 
 set -ag update-environment "SSH_TTY"
 #+END_SRC
@@ -117,7 +118,7 @@ You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
 Customization Interface or you can manually set the following variables in your
 =init.el=:
 
-*** Configuring multiplexer nesting
+*** Configuring Multiplexer Nesting
 :PROPERTIES:
 :CUSTOM_ID: nested
 :END:
@@ -130,7 +131,7 @@ terminal multiplexer on the local host.
 (setq clipetty-assume-nested-mux nil)
 #+END_SRC
 
-*** Configuring Tmux integration
+*** Configuring Tmux Integration
 The =clipetty-tmux-ssh-tty= variable tells Clipetty how to run =tmux= to query it's
 local =SSH_TTY= environment variable. This default assumes that =tmux= is on your
 PATH.  If =tmux= lives elsewhere for you, or it is named something else, you can
