@@ -40,34 +40,6 @@ add:
 (clipetty-mode 1) 
 #+END_SRC
 
-** Customize
-You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
-Customization Interface or you can manually set the following variables in your
-=init.el=:
-
-*** =clipetty-assume-nested-mux=
-:PROPERTIES:
-:CUSTOM_ID: nested
-:END:
-This variable, when set to a non-nill value, tells Clipetty to assume that if
-you're running a terminal mulitplexer on a remote host that it's nested -- that
-is to say that you're also running the same terminal multiplexer on the local
-host.
-
-#+BEGIN_SRC
-(setq clipetty-assume-nested-mux nil)
-#+END_SRC
-
-*** =clipetty-tmux-ssh-tty=
-This variable tells Clipetty how to run =tmux= to query it's local =SSH_TTY=
-environment variable. This default assumes that =tmux= is on your PATH.  If
-=tmux= lives elsewhere for you, or it is named something else, you can change it
-here."
-
-#+BEGIN_SRC
-(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
-#+END_SRC
-
 ** How Clipetty works
 Clipetty does its magic by assigning the =clipetty-cut= function to Emacs'
 =interprogram-cut-function= variable, which is what happens when you activate
@@ -139,6 +111,34 @@ set -ag update-environment "SSH_TTY"
 This will tell =tmux= to update its local =$SSH_TTY= environment variable when
 you re-attach, and Clipetty will ask =tmux= about it rather than relying on the
 (possibly stale) variable that Emacs inherited from the shell.
+
+** Customization
+You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
+Customization Interface or you can manually set the following variables in your
+=init.el=:
+
+*** Configuring multiplexer nesting
+:PROPERTIES:
+:CUSTOM_ID: nested
+:END:
+The =clipetty-assume-nested-mux= variable, when set to a non-nill value, tells
+Clipetty to assume that if you're running a terminal mulitplexer on a remote
+host that it's nested -- that is to say that you're also running the /same/
+terminal multiplexer on the local host.
+
+#+BEGIN_SRC
+(setq clipetty-assume-nested-mux nil)
+#+END_SRC
+
+*** Configuring Tmux integration
+The =clipetty-tmux-ssh-tty= variable tells Clipetty how to run =tmux= to query it's
+local =SSH_TTY= environment variable. This default assumes that =tmux= is on your
+PATH.  If =tmux= lives elsewhere for you, or it is named something else, you can
+change it here.
+
+#+BEGIN_SRC
+(setq clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY")
+#+END_SRC
 
 ** Acknowledgements
 This code was inspired by =osc52.el= by the Chromium OS Authors, which was very
