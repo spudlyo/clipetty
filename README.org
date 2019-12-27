@@ -1,5 +1,11 @@
 #+TITLE: Clipetty
 #+STARTUP: showeverything
+#+BEGIN_EXPORT md
+# Clipetty
+[![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
+
+**Table of Contents**
+#+END_EXPORT
 
 * Introduction
 Clipetty is an minor mode that sends text that you kill in Emacs to your
@@ -53,7 +59,7 @@ host.
 #+END_SRC
 
 ** =clipetty-tmux-ssh-tty=
-This variable tells Clipetty how to run =tmux= to query it's local SSH_TTY
+This variable tells Clipetty how to run =tmux= to query it's local =SSH_TTY=
 environment variable. This default assumes that =tmux= is on your PATH.  If
 =tmux= lives elsewhere for you, or it is named something else, you can change it
 here."
@@ -112,7 +118,7 @@ terminal multiplexers by writing the DCS wrapped OSC 52 escape sequence directly
 to your =$SSH_TTY= thereby bypassing the terminal multiplexer on the remote host
 entirely.
 
-** Dealing With a Stale SSH_TTY Environment Variable
+** Dealing With a Stale =SSH_TTY= Environment Variable
 :PROPERTIES:
 :CUSTOM_ID: stale
 :END:
