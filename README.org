@@ -12,8 +12,8 @@ to see if your favorite terminal emulator is on the list.
 - Works both locally and on remote hosts via SSH
 - Supports emacsclient with a mix of GUI and TTY frames
 - Works when running Emacs under GNU Screen or Tmux
-- Supports [[nested][nested GNU Screen or Tmux sessions]]
-- [[kitty][Compatible]] with the Kitty terminal emulator
+- Supports [[#nested][nested GNU Screen or Tmux sessions]]
+- [[#kitty][Compatible]] with the Kitty terminal emulator
 - Allows for [[#stale][seamless detach/re-attach with Tmux]]
 
 * Install
