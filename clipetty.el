@@ -1,6 +1,6 @@
-;;; clipetty.el --- Kill to the system clipboard from a TTY frame -*- lexical-binding: t; -*-
+;;; clipetty.el --- Send every kill from a TTY frame to the system clipboard -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019 Mike Hamrick
+;; Copyright (C) 2019-2020 Mike Hamrick
 
 ;; Author: Mike Hamrick <mikeh@muppetlabs.com>
 ;; Maintainer: Mike Hamrick <mikeh@muppetlabs.com>
@@ -52,10 +52,18 @@ it here."
   :type 'string
   :group 'clipetty)
 
-(defcustom clipetty-tmux-ssh-tty-regexp "SSH_TTY=\\([^[:space:]]+\\)"
-  "The regular expression used to capture the SSH_TTY from tmux.
-Unless you're inventing a new method of determining the SSH_TTY, it's
-unlikely you'll ever need to change this."
+(defcustom clipetty-screen-regexp "^screen"
+  "This regexp is matched against TERM to test for the presence of GNU screen.
+If you've configured GNU screen to use an unusual terminal type,
+you can change this regular expression so Clipetty will recognize
+you're running in screen."
+  :type 'string
+  :group 'clipetty)
+
+(defcustom clipetty-tmux-ssh-tty-regexp "^SSH_TTY=\\([^\n]+\\)"
+  "This regexp is used to capture the SSH_TTY from output of tmux.
+Unless you're inventing a new method for determining the SSH_TTY, after
+a detach / re-attach it's unlikely you'll need to change this."
   :type 'string
   :group 'clipetty)
 
@@ -64,56 +72,94 @@ unlikely you'll ever need to change this."
 The max OSC 52 message is 10,000 bytes.  This means we can
 support base64 encoded strings of up to 74,994 bytes long.")
 
+(defconst clipetty-screen-dcs-start "\eP"
+  "The start DCS escape sequence that GNU screen recognizes.")
+
+(defconst clipetty-tmux-dcs-start "\ePtmux;\e"
+  "The start DCS escape sequence that Tmux recognizes.")
+
+(defconst clipetty-dcs-end "\e\\"
+  "The end DCS escape sequence that everyone recognizes.")
+
+(defconst clipetty-osc-start "\e]52;c;"
+  "The initial OSC 52 escape sequence.")
+
+(defconst clipetty-osc-end "\a"
+  "The end OSC 52 escape sequence.")
+
 (defvar clipetty-original-icf interprogram-cut-function
   "Keep the original ICF to restore on `clipetty-toggle' function.")
+
+(defmacro clipetty-getenv (env)
+  "Return the environment variable ENV in the context of the selected frame."
+  (list 'getenv env (list 'selected-frame)))
 
 (defun clipetty-get-tmux-ssh-tty ()
   "Query tmux for its local SSH_TTY environment variable and return it.
 Return nil if tmux is unable to locate the environment variable"
-  (let (tmux-ssh-tty (shell-command-to-string clipetty-tmux-ssh-tty))
-    (if (string-match clipetty-tmux-ssh-tty-regexp tmux-ssh-tty)
-        (match-string 0 tmux-ssh-tty)
-      nil)))
+  (let ((tmux-ssh-tty (shell-command-to-string clipetty-tmux-ssh-tty)))
+    (if (and (not (eq tmux-ssh-tty nil))
+             (string-match clipetty-tmux-ssh-tty-regexp tmux-ssh-tty))
+        (match-string 1 tmux-ssh-tty)
+    nil)))
 
-(defun clipetty-tty ()
-  "Return which TTY we should send our OSC payload to."
-  (let ((ssh-tty (getenv "SSH_TTY" (selected-frame))))
-    (if (not ssh-tty)
-        (terminal-name)
-      (if (getenv "TMUX" (selected-frame))
-          ;; If we're SSH'd into a host running tmux that means
-          ;; `$SSH_TTY' could very well be stale due to
-          ;; detach/re-attach. This workaround queries tmux itself,
-          ;; rather than the environment variable to get the current
-          ;; value of `SSH_TTY'.
-          (let (tmux-ssh-tty (clipetty-get-tmux-ssh-tty))
-            (if tmux-ssh-tty tmux-ssh-tty ssh-tty)
-        ssh-tty)))))
+(defun clipetty-tty (ssh-tty tmux)
+  "Return which TTY we should send our OSC payload to.
+Both the SSH-TTY and TMUX arguments should come from the selected
+frame's environment."
+  (if (not ssh-tty)
+      (terminal-name)
+    (if tmux
+        (let ((tmux-ssh-tty (clipetty-get-tmux-ssh-tty)))
+          (if tmux-ssh-tty tmux-ssh-tty ssh-tty))
+      ssh-tty)))
 
-(defun clipetty-dcs-wrap (string)
-  "Return STRING wrapped in an appropriate DCS if necessary."
-  (let ((tmuxp   (getenv "TMUX" (selected-frame)))
-        (screenp (string-match-p "screen" (getenv "TERM" (selected-frame))))
-        (remotep (getenv "SSH_TTY" (selected-frame)))
-        (dcs      string))
-    (cond (screenp (setq dcs (concat "\eP" string "\e\\")))
-          (tmuxp   (setq dcs (concat "\ePtmux;\e" string "\e\\"))))
-    (if (and remotep (not clipetty-assume-nested-mux)) string dcs)))
+(defun clipetty-make-dcs (string &optional screen)
+  "Return STRING, wrapped in a Tmux flavored Device Control String.
+Return STRING, wrapped in a GNU screen flavored DCS, if SCREEN is non-nil."
+  (let ((dcs-start clipetty-tmux-dcs-start))
+    (when screen (setq dcs-start clipetty-screen-dcs-start))
+    (concat dcs-start string clipetty-dcs-end)))
 
-(defun clipetty-emit (string)
-  "Emit STRING, optionally wrapped in a DCS, to an appropriate tty."
-  (if (<= (length string) clipetty-max-cut)
-      (write-region (clipetty-dcs-wrap string) nil (clipetty-tty) t 0)
-    (message "Selection too long to send to terminal %d" (length string))
-    (sit-for 1)))
+(defun clipetty-dcs-wrap (string tmux term ssh-tty)
+  "Return STRING wrapped in an appropriate DCS if necessary.
+The arguments TMUX, TERM, and SSH-TTY should come from the selected
+frame's environment."
+  (let ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
+        (dcs    string))
+    (cond (screen (setq dcs (clipetty-make-dcs string t)))
+          (tmux   (setq dcs (clipetty-make-dcs string))))
+    (if ssh-tty (if clipetty-assume-nested-mux dcs string) dcs)))
 
 (defun clipetty-osc (string &optional encode)
   "Return an OSC 52 escape sequence out of STRING.
 Optionally base64 encode it first if you specify non-nil for ENCODE."
   (let ((bin (base64-encode-string (encode-coding-string string 'binary) t)))
-    (concat "\e]52;c;" (if encode bin string) "\a")))
+    (concat clipetty-osc-start (if encode bin string) clipetty-osc-end)))
 
-;;;###autoload
+(defun clipetty-emit (string)
+  "Emit STRING, optionally wrapped in a DCS, to an appropriate tty."
+  (let ((tmux    (clipetty-getenv "TMUX"))
+        (term    (clipetty-getenv "TERM"))
+        (ssh-tty (clipetty-getenv "SSH_TTY")))
+    (if (<= (length string) clipetty-max-cut)
+        (write-region
+         (clipetty-dcs-wrap string tmux term ssh-tty)
+         nil
+         (clipetty-tty ssh-tty tmux))
+         t
+         0)
+      (message "Selection too long to send to terminal %d" (length string))
+      (sit-for 1)))
+
+(defun clipetty-toggle ()
+  "Toggle assignment of `clipetty-cut' to the `interprogram-cut-function'.
+Return non-nil if Clipetty is enabled as the result of the toggle."
+  (if (eq interprogram-cut-function #'clipetty-cut)
+      (progn (setq interprogram-cut-function clipetty-original-icf) nil)
+    (setq clipetty-original-icf interprogram-cut-function)
+    (setq interprogram-cut-function #'clipetty-cut) t))
+
 (defun clipetty-cut (string)
   "If in a terminal frame, convert STRING to a series of OSC 52 messages."
   (if (display-graphic-p)
@@ -125,14 +171,6 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
     ;; TODO: Support longer than `clipetty-max-cut' length messages in Kitty.
     (clipetty-emit (clipetty-osc "!"))
     (clipetty-emit (clipetty-osc string t))))
-
-;;;###autoload
-(defun clipetty-toggle ()
-  "Toggle assignment of `clipetty-cut' to the `interprogram-cut-function'."
-  (if (eq interprogram-cut-function #'clipetty-cut)
-      (setq interprogram-cut-function clipetty-original-icf)
-    (setq clipetty-original-icf interprogram-cut-function)
-    (setq interprogram-cut-function #'clipetty-cut)))
 
 ;;;###autoload
 (defun clipetty-kill-ring-save (beg end &optional region)
@@ -148,8 +186,8 @@ explicitly."
     (clipetty-toggle)))
 
 (define-minor-mode clipetty-mode
-  "Send every kill to your Operating System's Clipboard."
-  :lighter " clptty"
+  "Send every kill from a TTY frame to the system clipboard."
+  :lighter " Clp"
   :global
   (clipetty-toggle))
 
