@@ -36,6 +36,13 @@
 
 ;;; Code:
 
+(defgroup clipetty nil
+  "Send every kill from a TTY frame to the system clipboard."
+  :group 'terminals
+  :group 'convenience
+  :link '(emacs-commentary-link :tag "Commentary" "clipetty.el")
+  :link '(emacs-library-link :tag "Lisp File" "clipetty.el"))
+
 (defcustom clipetty-assume-nested-mux nil
   "Non-nil means if we detect a remote multiplexer, we assume it's nested.
 Nesting is the practice of running a terminal multiplexer inside
@@ -87,7 +94,7 @@ support base64 encoded strings of up to 74,994 bytes long.")
 (defconst clipetty-osc-end "\a"
   "The end OSC 52 escape sequence.")
 
-(defvar clipetty-original-icf interprogram-cut-function
+(defvar clipetty-original-icf nil
   "Keep the original ICF to restore on `clipetty-toggle' function.")
 
 (defmacro clipetty-getenv (env)
@@ -146,19 +153,35 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
         (write-region
          (clipetty-dcs-wrap string tmux term ssh-tty)
          nil
-         (clipetty-tty ssh-tty tmux))
+         (clipetty-tty ssh-tty tmux)
          t
          0)
       (message "Selection too long to send to terminal %d" (length string))
-      (sit-for 1)))
+      (sit-for 1))))
+
+(defun clipetty-p ()
+  "Return non-nil if Clipetty is enabled."
+(eq interprogram-cut-function #'clipetty-cut))
+
+(defun clipetty-on ()
+  "Turn Clipetty on.
+Stash the old value of `interprogram-cut-function' to `clipetty-original-icf'
+and assign `clipetty-cut'"
+  (when (not (clipetty-p))
+    (setq clipetty-original-icf interprogram-cut-function)
+    (setq interprogram-cut-function #'clipetty-cut)))
+
+(defun clipetty-off ()
+  "Turn Clipetty off by restoring the original `interprogram-cut-function'."
+  (when (clipetty-p)
+    (setq interprogram-cut-function clipetty-original-icf)))
 
 (defun clipetty-toggle ()
   "Toggle assignment of `clipetty-cut' to the `interprogram-cut-function'.
 Return non-nil if Clipetty is enabled as the result of the toggle."
-  (if (eq interprogram-cut-function #'clipetty-cut)
-      (progn (setq interprogram-cut-function clipetty-original-icf) nil)
-    (setq clipetty-original-icf interprogram-cut-function)
-    (setq interprogram-cut-function #'clipetty-cut) t))
+  (if (clipetty-p)
+      (progn (clipetty-off) nil)
+    (clipetty-on) t))
 
 (defun clipetty-cut (string)
   "If in a terminal frame, convert STRING to a series of OSC 52 messages."
@@ -172,25 +195,35 @@ Return non-nil if Clipetty is enabled as the result of the toggle."
     (clipetty-emit (clipetty-osc "!"))
     (clipetty-emit (clipetty-osc string t))))
 
-;;;###autoload
 (defun clipetty-kill-ring-save (beg end &optional region)
   "Enables Clipetty for this save, passes BEG END and optionally REGION.
 It can be annoying to have Clipetty overwrite your system
 clipboard every time you kill something.  This function wraps
 Clipetty around the `kill-ring-save' function and can be invoked
 explicitly."
-  (if (eq interprogram-cut-function #'clipetty-cut)
+  (if (clipetty-p)
       (kill-ring-save beg end region)
     (clipetty-toggle)
     (kill-ring-save beg end region)
     (clipetty-toggle)))
 
+;;;###autoload
 (define-minor-mode clipetty-mode
-  "Send every kill from a TTY frame to the system clipboard."
+  "Minor mode to send every kill from a TTY frame to the system clipboard."
   :lighter " Clp"
-  :global
-  (clipetty-toggle))
+  :group 'clipetty
+  :init-value nil
+  :global nil
+  (make-local-variable 'interprogram-cut-function)
+  (if clipetty-mode
+      (clipetty-on)
+    (clipetty-off)))
+
+;;;###autoload
+(define-globalized-minor-mode global-clipetty-mode
+  clipetty-mode
+  (lambda () (clipetty-mode +1))
+  :group 'clipetty)
 
 (provide 'clipetty)
-
 ;;; clipetty.el ends here
