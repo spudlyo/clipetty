@@ -1,5 +1,6 @@
 # Clipetty
 
+[![Build Status](https://github.com/spudlyo/clipetty/workflows/CI/badge.svg)](https://github.com/spudlyo/clipetty/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 Clipetty is a minor mode for terminal (TTY) users that sends text that you kill in Emacs to your Operating System's clipboard. If you predominately use Emacs in GUI (X-Windows, macOS, Windows) frames you don't need Clipetty.

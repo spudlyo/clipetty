@@ -4,6 +4,7 @@
 
 * Clipetty
 #+BEGIN_EXPORT md
+[![Build Status](https://github.com/spudlyo/clipetty/workflows/CI/badge.svg)](https://github.com/spudlyo/clipetty/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 #+END_EXPORT
 Clipetty is a minor mode for terminal (TTY) users that sends text that you kill
