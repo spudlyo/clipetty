@@ -56,7 +56,7 @@ it here."
   "This regexp is matched against TERM to test for the presence of GNU screen.
 If you've configured GNU screen to use an unusual terminal type,
 you can change this regular expression so Clipetty will recognize
-you're running in screen."
+when you're running in screen."
   :type 'string
   :group 'clipetty)
 
