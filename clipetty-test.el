@@ -31,8 +31,6 @@
 
 ;;; Code:
 
-(add-to-list 'load-path ".")
-(require 'clipetty)
 (require 'ert)
 
 (ert-deftest clipetty-test-get-tmux-ssh-tty ()
