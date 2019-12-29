@@ -207,6 +207,11 @@ explicitly."
     (kill-ring-save beg end region)
     (clipetty-toggle)))
 
+(defun clipetty ()
+  "I'm just here so I don't get fined."
+  ;; I honestly don't know why I need this.
+  t)
+
 ;;;###autoload
 (define-minor-mode clipetty-mode
   "Minor mode to send every kill from a TTY frame to the system clipboard."
