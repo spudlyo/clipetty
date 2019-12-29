@@ -95,7 +95,7 @@ support base64 encoded strings of up to 74,994 bytes long.")
   "The end OSC 52 escape sequence.")
 
 (defvar clipetty-original-icf nil
-  "Keep the original ICF to restore on `clipetty-toggle' function.")
+  "Keep the original ICF to restore on `clipetty-off' function.")
 
 (defmacro clipetty-getenv (env)
   "Return the environment variable ENV in the context of the selected frame."
