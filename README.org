@@ -32,7 +32,7 @@ If you're using =use-package= you can add this to your =init.el= file:
 #+BEGIN_SRC
 (use-package clipetty
   :ensure t
-  :hook (after-init . 'global-clipetty-mode))
+  :hook (after-init . global-clipetty-mode))
 #+END_SRC
 
 *** Manual

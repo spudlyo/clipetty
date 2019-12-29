@@ -30,7 +30,7 @@ If you're using `use-package` you can add this to your `init.el` file:
 ```
 (use-package clipetty
   :ensure t
-  :hook (after-init . 'global-clipetty-mode))
+  :hook (after-init . global-clipetty-mode))
 ```
 
 
