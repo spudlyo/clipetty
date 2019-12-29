@@ -20,7 +20,7 @@ For this to work you need to be using a terminal emulator that supports OSC 52 e
 
 ## Install
 
-Setup is pretty easy, typically you won't need to configure anything to get started.
+If you want Clipetty to work everywhere, you can enable `global-clipetty-mode`, otherwise you can enable `clipetty-mode` on a buffer-by-buffer basis.
 
 
 ### Use-package
@@ -30,7 +30,7 @@ If you're using `use-package` you can add this to your `init.el` file:
 ```
 (use-package clipetty
   :ensure t
-  :hook (after-init . clipetty-mode))
+  :hook (after-init . 'global-clipetty-mode))
 ```
 
 
@@ -40,7 +40,7 @@ If you manually installed `clipetty.el` somewhere on your `load-path` you can ad
 
 ```
 (require 'clipetty)
-(clipetty-mode 1) 
+(global-clipetty-mode)
 ```
 
 
