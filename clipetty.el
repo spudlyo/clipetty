@@ -64,14 +64,14 @@ it here."
 If you've configured GNU screen to use an unusual terminal type,
 you can change this regular expression so Clipetty will recognize
 when you're running in screen."
-  :type 'string
+  :type 'regexp
   :group 'clipetty)
 
 (defcustom clipetty-tmux-ssh-tty-regexp "^SSH_TTY=\\([^\n]+\\)"
   "This regexp is used to capture the SSH_TTY from output of tmux.
 Unless you're inventing a new method for determining the SSH_TTY, after
 a detach / re-attach it's unlikely you'll need to change this."
-  :type 'string
+  :type 'regexp
   :group 'clipetty)
 
 (defconst clipetty-max-cut 74994
@@ -96,10 +96,6 @@ support base64 encoded strings of up to 74,994 bytes long.")
 
 (defvar clipetty-original-icf nil
   "Keep the original ICF to restore on `clipetty-off' function.")
-
-(defmacro clipetty-getenv (env)
-  "Return the environment variable ENV in the context of the selected frame."
-  (list 'getenv env (list 'selected-frame)))
 
 (defun clipetty-get-tmux-ssh-tty ()
   "Query tmux for its local SSH_TTY environment variable and return it.
@@ -146,9 +142,9 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
 
 (defun clipetty-emit (string)
   "Emit STRING, optionally wrapped in a DCS, to an appropriate tty."
-  (let ((tmux    (clipetty-getenv "TMUX"))
-        (term    (clipetty-getenv "TERM"))
-        (ssh-tty (clipetty-getenv "SSH_TTY")))
+  (let ((tmux    (getenv "TMUX" (selected-frame)))
+        (term    (getenv "TERM" (selected-frame)))
+        (ssh-tty (getenv "SSH_TTY" (selected-frame))))
     (if (<= (length string) clipetty-max-cut)
         (write-region
          (clipetty-dcs-wrap string tmux term ssh-tty)
@@ -180,7 +176,7 @@ and assign `clipetty-cut'"
   "Toggle assignment of `clipetty-cut' to the `interprogram-cut-function'.
 Return non-nil if Clipetty is enabled as the result of the toggle."
   (if (clipetty-p)
-      (progn (clipetty-off) nil)
+      (ignore (clipetty-off))
     (clipetty-on) t))
 
 (defun clipetty-cut (string)
@@ -206,11 +202,6 @@ explicitly."
     (clipetty-toggle)
     (kill-ring-save beg end region)
     (clipetty-toggle)))
-
-(defun clipetty ()
-  "I'm just here so I don't get fined."
-  ;; I honestly don't know why I need this.
-  t)
 
 ;;;###autoload
 (define-minor-mode clipetty-mode
