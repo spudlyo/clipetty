@@ -8,14 +8,15 @@ Clipetty is a minor mode for terminal (TTY) users that sends text that you kill 
 For this to work you need to be using a terminal emulator that supports OSC 52 escape sequences. See the [Terminals](#terminals) section below to check if your favorite terminal emulator is on the list.
 
 
-## Features
+## Reasons to Use Clipetty Over Emacs' Built-in OSC 52 Support
 
--   Works both locally and on remote hosts via SSH
--   Supports emacsclient with a mix of GUI and TTY frames
--   Works when running Emacs under GNU Screen or Tmux
--   Supports [nested GNU Screen or Tmux sessions](#nested)
--   [Compatible](#kitty) with the Kitty terminal emulator
--   Allows for [seamless detach/re-attach with Tmux](#stale)
+Here are some reasons why you might want to use Clipetty instead of the native OSC 52 functionality found in Emacs' [xterm.el](https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el):
+
+-   Clipetty works when running Emacs under GNU Screen or Tmux
+-   Clipetty works when running Emacs on remote hosts over SSH
+-   Clipetty allows for [seamless detach/re-attach with Tmux](#stale) on remote hosts
+-   Clipetty supports [nested GNU Screen or Tmux sessions](#nested)
+-   Clipetty is [compatible](#kitty) with the Kitty terminal emulator
 
 
 ## Install
@@ -44,7 +45,20 @@ If you manually installed `clipetty.el` somewhere on your `load-path` you can ad
 ```
 
 
-## How Clipetty works
+### Using Clipetty From a Key Binding
+
+Sometimes it can be annoying to have Clipetty overwrite your system clipboard every time you kill something. Let's say you want to paste something from your system clipboard into Emacs, but before you can paste it, you need to do some minor editing (like hitting `C-k` or `M-d`) which kills some text. Now you've overwritten your system clipboard (which doesn't have a kill ring) and you have to copy it all over again. Doh!
+
+You can invoke Clipetty explicitly from a key binding to copy a region to the clipboard rather than using either the local or global minor modes. To that end, Clipetty has a function called `clipetty-kill-ring-save` which I like to bind to `M-w` like so:
+
+```
+(use-package clipetty
+  :ensure t
+  :bind ("M-w" . clipetty-kill-ring-save))
+```
+
+
+## How Clipetty Works
 
 Clipetty does its magic by assigning the `clipetty-cut` function to Emacs' `interprogram-cut-function` variable, which is what happens when you activate `clipetty-mode`. When the mode is active, every time you kill a line or region Clipetty gets sent the content that is destined for the kill ring. The `clipetty-cut` function takes this content, converts it to base64, wraps it in an [ANSI OSC](https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences) 52 escape sequence, and then sends it to your terminal. Terminal programs which support OSC 52 commands will react to this by stripping off the escape sequence, decoding the base64 content, and then inserting the resulting string into the system clipboard.
 
@@ -53,10 +67,10 @@ Clipetty does its magic by assigning the `clipetty-cut` function to Emacs' `inte
 
 ## Terminals that Support OSC Clipboard Operations
 
+-   [xterm](https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt) (Unix &#x2013; Where OSC 52 escape sequences originated)
 -   [iTerm2](https://iterm2.com) (macOS)
 -   [Alacritty](https://github.com/jwilm/alacritty) (macOS, Linux, BSD, WIndows)
 -   [kitty](https://sw.kovidgoyal.net/kitty/) (macOS, Linux)
--   [xterm](https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt) (Unix)
 -   [mintty](https://mintty.github.io/) (Windows)
 -   [hterm](https://hterm.org) (Javascript)
 
@@ -67,7 +81,7 @@ This is not an exhaustive list, these are just the ones I know about. Submit a P
 
 ### Kitty
 
-The `kitty` terminal gets honorable mention for extending the `xterm` protocol to [support larger clipboards](https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard). While Clipetty at this time does not support Kitty's larger clipboard, it is compatible.
+The `kitty` terminal gets honorable mention for extending the `xterm` protocol to [support larger clipboards](https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard). While Clipetty at this time does not support Kitty's larger clipboard, it is compatible, which means you don't have to disable Kitty's protocol extension with `no-append`.
 
 
 ## Clipetty and Terminal Multiplexers
@@ -94,7 +108,7 @@ This will tell `tmux` to update its local `$SSH_TTY` environment variable when y
 
 ## Customization
 
-You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customization Interface or you can manually set the following variables in your `init.el`:
+You can run `M-x customize-group RET clipetty RET` to use Emacs' Easy Customization Interface or you can manually set some of the variables below in your `init.el`:
 
 
 <a id="nested"></a>
