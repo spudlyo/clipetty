@@ -191,17 +191,19 @@ Return non-nil if Clipetty is enabled as the result of the toggle."
     (clipetty-emit (clipetty-osc "!"))
     (clipetty-emit (clipetty-osc string t))))
 
-(defun clipetty-kill-ring-save (beg end &optional region)
-  "Enables Clipetty for this save, passes BEG END and optionally REGION.
+(defun clipetty-kill-ring-save ()
+  "Enables Clipetty just for this save.
 It can be annoying to have Clipetty overwrite your system
 clipboard every time you kill something.  This function wraps
 Clipetty around the `kill-ring-save' function and can be invoked
 explicitly."
-  (if (clipetty-p)
-      (kill-ring-save beg end region)
-    (clipetty-toggle)
-    (kill-ring-save beg end region)
-    (clipetty-toggle)))
+  (interactive)
+  (when (use-region-p)
+    (if (clipetty-p)
+        (kill-ring-save (region-beginning) (region-end))
+      (clipetty-toggle)
+      (kill-ring-save (region-beginning) (region-end))
+      (clipetty-toggle))))
 
 ;;;###autoload
 (define-minor-mode clipetty-mode
