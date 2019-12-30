@@ -19,27 +19,27 @@ else
     ERROR_ON_WARN=t
 fi
 
-# Ensure everything compiles.
+echo "Running the compilation tests."
 "$EMACS" -Q -batch \
          -l clipetty.el \
          --eval "(setq byte-compile-error-on-warn ${ERROR_ON_WARN})" \
          -f batch-byte-compile \
-         clipetty.el test/clipetty-test.el test/clipetty-checkdoc.el
+         clipetty.el test/clipetty-test.el
 
-# Ensure everything passes checkdoc.
-"$EMACS" -Q -batch \
-         -l test/clipetty-checkdoc.el \
-         -f clipetty-checkdoc-batch \
-         clipetty.el test/clipetty-test.el test/clipetty-checkdoc.el
-
-# Ensure package-lint is happy.
+echo "Running the package-lint tests."
 "$EMACS" -Q -batch \
          --eval "$INIT_PACKAGE_EL" \
          -l package-lint.el \
          -f package-lint-batch-and-exit \
-         clipetty.el test/clipetty-test.el test/clipetty-checkdoc.el || [ -n "${EMACS_LINT_IGNORE+x}" ]
+         clipetty.el test/clipetty-test.el || [ -n "${EMACS_LINT_IGNORE+x}" ]
 
-# Run the clipetty unit tests.
+echo "Running the checkdoc tests."
+"$EMACS" -Q -batch \
+         -l test/clipetty-test.el \
+         -f clipetty-test-checkdoc-batch \
+         clipetty.el test/clipetty-test.el
+
+echo "Running Clipetty unit tests."
 "$EMACS" -Q -batch \
          -l clipetty.el \
          -l test/clipetty-test.el \
