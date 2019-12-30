@@ -191,6 +191,7 @@ Return non-nil if Clipetty is enabled as the result of the toggle."
     (clipetty-emit (clipetty-osc "!"))
     (clipetty-emit (clipetty-osc string t))))
 
+;;;###autoload
 (defun clipetty-kill-ring-save ()
   "Enables Clipetty just for this save.
 It can be annoying to have Clipetty overwrite your system
