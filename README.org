@@ -15,7 +15,7 @@ For this to work you need to be using a terminal emulator that supports OSC 52
 escape sequences. See the [[#terminals][Terminals]] section below to check if your favorite
 terminal emulator is on the list.
 
-** Reasons to Use Clipetty Over Emacs' Built-in OSC 52 Support
+** Reasons to Use Clipetty Over Emacs' Built-in Xterm Support
 Here are some reasons why you might want to use Clipetty instead of the native
 OSC 52 functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el][xterm.el]]:
 
