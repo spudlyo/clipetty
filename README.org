@@ -17,7 +17,7 @@ terminal emulator is on the list.
 
 ** Reasons to Use Clipetty Over Emacs' Built-in Xterm Support
 Here are some reasons why you might want to use Clipetty instead of the native
-OSC 52 functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el][xterm.el]]:
+functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el][xterm.el]]:
 
 - Clipetty supports both GNU screen and Tmux, either locally or over SSH
 - Clipetty supports [[#nested][nested GNU Screen or Tmux sessions]]
