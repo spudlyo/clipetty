@@ -19,10 +19,9 @@ terminal emulator is on the list.
 Here are some reasons why you might want to use Clipetty instead of the native
 OSC 52 functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el][xterm.el]]:
 
-- Clipetty works when running Emacs under GNU Screen or Tmux
-- Clipetty works when running Emacs on remote hosts over SSH
-- Clipetty allows for [[#stale][seamless detach/re-attach with Tmux]] on remote hosts
+- Clipetty supports both GNU screen and Tmux, either locally or over SSH
 - Clipetty supports [[#nested][nested GNU Screen or Tmux sessions]]
+- Clipetty allows for [[#stale][seamless detach/re-attach with Tmux]] on remote hosts
 - Clipetty is [[#kitty][compatible]] with the Kitty terminal emulator
 
 ** Install
