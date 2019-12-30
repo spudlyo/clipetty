@@ -132,4 +132,4 @@ The `clipetty-tmux-ssh-tty` variable tells Clipetty how to run `tmux` to query i
 
 ## Acknowledgements
 
-This code was inspired by `osc52.el` by the Chromium OS Authors, which was very helpful in showing me how this could be done, but lacked support for `tmux` and nested terminal multiplexers. I'd also like to thank Suraj N. Kurapati, as I learned a lot by studying his shell script `yank`.
+This code was inspired by `osc52.el` (part of the Chromium OS) which was very helpful in showing me how this could be done, but lacked support for `tmux` and didn't have support for nested terminal multiplexers. I'd also like to thank Suraj N. Kurapati, as I learned a lot by studying his shell script `yank`. Thanks to everyone on the Freenode #emacs IRC channel for helping me out, especially `bpalmer` who graciously reviewed my code and offered great suggestions.
