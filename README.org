@@ -15,13 +15,15 @@ For this to work you need to be using a terminal emulator that supports OSC 52
 escape sequences. See the [[#terminals][Terminals]] section below to check if your favorite
 terminal emulator is on the list.
 
-** Features
-- Works both locally and on remote hosts via SSH
-- Supports emacsclient with a mix of GUI and TTY frames
-- Works when running Emacs under GNU Screen or Tmux
-- Supports [[#nested][nested GNU Screen or Tmux sessions]]
-- [[#kitty][Compatible]] with the Kitty terminal emulator
-- Allows for [[#stale][seamless detach/re-attach with Tmux]]
+** Reasons to Use Clipetty Over Emacs' Built-in OSC 52 Support
+Here are some reasons why you might want to use Clipetty instead of the native
+OSC 52 functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el][xterm.el]]:
+
+- Clipetty works when running Emacs under GNU Screen or Tmux
+- Clipetty works when running Emacs on remote hosts over SSH
+- Clipetty allows for [[#stale][seamless detach/re-attach with Tmux]] on remote hosts
+- Clipetty supports [[#nested][nested GNU Screen or Tmux sessions]]
+- Clipetty is [[#kitty][compatible]] with the Kitty terminal emulator
 
 ** Install
 If you want Clipetty to work everywhere, you can enable =global-clipetty-mode=,
@@ -43,7 +45,26 @@ add:
 (global-clipetty-mode)
 #+END_SRC
 
-** How Clipetty works
+*** Using Clipetty From a Key Binding
+Sometimes it can be annoying to have Clipetty overwrite your system clipboard
+every time you kill something. Let's say you want to paste something from your
+system clipboard into Emacs, but before you can paste it, you need to do some
+minor editing (like hitting =C-k= or =M-d=) which kills some text. Now you've
+overwritten your system clipboard (which doesn't have a kill ring) and you have
+to copy it all over again. Doh!
+
+You can invoke Clipetty explicitly from a key binding to copy a region to
+the clipboard rather than using either the local or global minor modes. To that
+end, Clipetty has a function called =clipetty-kill-ring-save= which I like to bind
+to =M-w= like so:
+
+#+BEGIN_SRC
+(use-package clipetty
+  :ensure t
+  :bind ("M-w" . clipetty-kill-ring-save))
+#+END_SRC
+
+** How Clipetty Works
 Clipetty does its magic by assigning the =clipetty-cut= function to Emacs'
 =interprogram-cut-function= variable, which is what happens when you activate
 =clipetty-mode=. When the mode is active, every time you kill a line or region
@@ -58,10 +79,10 @@ string into the system clipboard.
 :PROPERTIES:
 :CUSTOM_ID: terminals
 :END:
+- [[https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt][xterm]] (Unix -- Where OSC 52 escape sequences originated)
 - [[https://iterm2.com][iTerm2]] (macOS)
 - [[https://github.com/jwilm/alacritty][Alacritty]] (macOS, Linux, BSD, WIndows)
 - [[https://sw.kovidgoyal.net/kitty/][kitty]] (macOS, Linux)
-- [[https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt][xterm]] (Unix)
 - [[https://mintty.github.io/][mintty]] (Windows)
 - [[https://hterm.org][hterm]] (Javascript)
 This is not an exhaustive list, these are just the ones I know about. Submit a
@@ -71,9 +92,10 @@ PR if you know of any I missed.
 :PROPERTIES:
 :CUSTOM_ID: kitty
 :END:
-The =kitty= terminal gets honorable mention for extending the =xterm= protocol
-to [[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]]. While Clipetty at this time does not support
-Kitty's larger clipboard, it is compatible.
+The =kitty= terminal gets honorable mention for extending the =xterm= protocol to
+[[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]]. While Clipetty at this time does not support Kitty's
+larger clipboard, it is compatible, which means you don't have to disable
+Kitty's protocol extension with =no-append=.
 
 ** Clipetty and Terminal Multiplexers
 If you're running Emacs under a terminal multiplexer like =tmux= or =screen=,
@@ -117,7 +139,7 @@ you re-attach, and Clipetty will ask =tmux= about it rather than relying on the
 
 ** Customization
 You can run =M-x customize-group RET clipetty RET= to use Emacs' Easy
-Customization Interface or you can manually set the following variables in your
+Customization Interface or you can manually set some of the variables below in your
 =init.el=:
 
 *** Configuring Multiplexer Nesting
