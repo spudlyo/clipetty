@@ -12,10 +12,9 @@ For this to work you need to be using a terminal emulator that supports OSC 52 e
 
 Here are some reasons why you might want to use Clipetty instead of the native OSC 52 functionality found in Emacs' [xterm.el](https://github.com/emacs-mirror/emacs/blob/master/lisp/term/xterm.el):
 
--   Clipetty works when running Emacs under GNU Screen or Tmux
--   Clipetty works when running Emacs on remote hosts over SSH
--   Clipetty allows for [seamless detach/re-attach with Tmux](#stale) on remote hosts
+-   Clipetty supports both GNU screen and Tmux, either locally or over SSH
 -   Clipetty supports [nested GNU Screen or Tmux sessions](#nested)
+-   Clipetty allows for [seamless detach/re-attach with Tmux](#stale) on remote hosts
 -   Clipetty is [compatible](#kitty) with the Kitty terminal emulator
 
 
