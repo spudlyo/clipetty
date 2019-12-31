@@ -1,0 +1,30 @@
+* How to Contribute
+Thanks for considering contributing to this project, it would be /amazing/ if that
+happened, and I'd be stoked to have help!
+
+** Submit a Pull Request
+Fork the project on Github, commit your changes to your fork's master branch,
+and then submit a Pull Request. I'll take a look, and we'll have a conversation
+about your proposed changes in the PR.
+*** Tests
+**** Adding Them
+If your PR contains a non-trivial change or fixes a bug that the unit tests
+didn't catch, it'd be great if you were to add one or more unit tests to
+[[https://github.com/spudlyo/clipetty/blob/master/test/clipetty-test.el][clipetty-test.el]].
+**** Passing Them
+The script [[https://github.com/spudlyo/clipetty/blob/master/run-tests.sh][run-tests.sh]] is used by the CI workflow to make sure commits to
+master or new pull requests pass all the existing tests, including:
+
+- Ensuring the elisp byte-compiles cleanly
+- Ensuring that =M-x checkdoc= is happy
+- Ensuring that [[https://github.com/purcell/package-lint][package-lint]] is happy
+- Ensuring that all the existing unit tests still pass
+
+Some of these tests can be picky and annoying. My advice is to just make the
+linter happy and move on. You should probably run =run-tests.sh= manually yourself
+before submitting your PR so there aren't any surprises.
+
+** Updating the Docs
+The =README.md= file is generated from [[https://github.com/spudlyo/clipetty/blob/master/README.org][README.org]] using
+=org-gfm-export-to-markdown=, so if you'd like to suggest a change to the
+documentation, make sure to commit your change to the right place.
