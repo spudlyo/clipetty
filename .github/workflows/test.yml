@@ -5,6 +5,10 @@ on:
     paths-ignore:
     - '*.md'
     - '*.org'
+  pull_request:
+    paths-ignore:
+    - '*.md'
+    - '*.org'
 
 jobs:
   build:
