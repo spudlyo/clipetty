@@ -22,7 +22,7 @@ Here are some reasons why you might want to use Clipetty instead of the native f
 
 ## Install
 
-The recommended way to get Clipetty is as a package from the [MELPA](https://melpa.org/#/clipetty) repository, which tracks the master branch of this repository and will almost always be up-to-date. There are also packages in MELPA Stable, which track the most recent [stable release](https://github.com/spudlyo/clipetty/releases).
+The recommended way to get Clipetty is as a package from the [MELPA](https://melpa.org/#/clipetty) repository, which tracks the master branch of this repository and will almost always be up-to-date. You can also get Clipetty from [MELPA Stable](https://stable.melpa.org/#/clipetty), which tracks the most recent [stable release](https://github.com/spudlyo/clipetty/releases).
 
 If you want Clipetty to work everywhere, you can enable `global-clipetty-mode`, otherwise you can enable `clipetty-mode` on a buffer-by-buffer basis.
 
@@ -84,7 +84,7 @@ This is not an exhaustive list, these are just the ones I know about. Submit a P
 
 ### Kitty
 
-The `kitty` terminal gets honorable mention for extending the `xterm` protocol to [support larger clipboards](https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard). While Clipetty at this time does not support Kitty's larger clipboard, it is compatible, which means you don't have to disable Kitty's protocol extension with `no-append`.
+The `kitty` terminal gets honorable mention for extending the `xterm` protocol to [support larger clipboards](https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard). While Clipetty at this time [does not support Kitty's larger clipboard](https://github.com/spudlyo/clipetty/issues/1), it is compatible, which means you don't have to disable Kitty's protocol extension with `no-append`.
 
 
 ## Clipetty and Terminal Multiplexers

@@ -29,8 +29,8 @@ functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/maste
 ** Install
 The recommended way to get Clipetty is as a package from the [[https://melpa.org/#/clipetty][MELPA]] repository,
 which tracks the master branch of this repository and will almost always be
-up-to-date. There are also packages in MELPA Stable, which track the most recent
-[[https://github.com/spudlyo/clipetty/releases][stable release]].
+up-to-date. You can also get Clipetty from [[https://stable.melpa.org/#/clipetty][MELPA Stable]], which tracks the most
+recent [[https://github.com/spudlyo/clipetty/releases][stable release]].
 
 If you want Clipetty to work everywhere, you can enable =global-clipetty-mode=,
 otherwise you can enable =clipetty-mode= on a buffer-by-buffer basis.
@@ -100,8 +100,8 @@ PR if you know of any I missed.
 :CUSTOM_ID: kitty
 :END:
 The =kitty= terminal gets honorable mention for extending the =xterm= protocol to
-[[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]]. While Clipetty at this time does not support Kitty's
-larger clipboard, it is compatible, which means you don't have to disable
+[[https://sw.kovidgoyal.net/kitty/protocol-extensions.html#pasting-to-clipboard][support larger clipboards]]. While Clipetty at this time [[https://github.com/spudlyo/clipetty/issues/1][does not support Kitty's
+larger clipboard]], it is compatible, which means you don't have to disable
 Kitty's protocol extension with =no-append=.
 
 ** Clipetty and Terminal Multiplexers
