@@ -93,12 +93,18 @@
     (should (equal (clipetty-osc "foo") osc-foo))
     (should (equal (clipetty-osc "foo" t) osc-bin))))
 
-(ert-deftest clipetty-test-clipetty-toggle ()
-  "Test the `clipetty-toggle' function."
+(ert-deftest clipetty-test-clipetty-mode ()
+  "Test the `clipetty-mode' function."
   (let ((old-ipc interprogram-cut-function))
-    (should (and (clipetty-toggle)
+    (should (and (clipetty-mode)
                  (equal interprogram-cut-function #'clipetty-cut)))
-    (should (and (not (clipetty-toggle))
+    (should (and (clipetty-mode 1)
+                 (equal interprogram-cut-function #'clipetty-cut)))
+    (should (and (clipetty-mode +1)
+                 (equal interprogram-cut-function #'clipetty-cut)))
+    (should (and (not (clipetty-mode 0))
+                 (equal interprogram-cut-function old-ipc)))
+    (should (and (not (clipetty-mode -1))
                  (equal interprogram-cut-function old-ipc)))))
 
 ;;; Checkdoc test
