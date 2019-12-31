@@ -94,7 +94,7 @@ support base64 encoded strings of up to 74,994 bytes long.")
 (defconst clipetty-osc-end "\a"
   "The end OSC 52 escape sequence.")
 
-(defvar clipetty-original-icf nil
+(defvar-local clipetty-original-icf interprogram-cut-function
   "Keep the original ICF to restore on `clipetty-off' function.")
 
 (defun clipetty-get-tmux-ssh-tty ()
@@ -176,8 +176,9 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
   :global nil
   (make-local-variable 'interprogram-cut-function)
   (if clipetty-mode
-      (setq clipetty-original-icf interprogram-cut-function
-            interprogram-cut-function #'clipetty-cut)
+      (when (not (eq interprogram-cut-function #'clipetty-cut))
+        (setq clipetty-original-icf interprogram-cut-function
+              interprogram-cut-function #'clipetty-cut))
     (setq interprogram-cut-function clipetty-original-icf)))
 
 ;;;###autoload
