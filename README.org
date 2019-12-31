@@ -4,6 +4,8 @@
 
 * Clipetty
 #+BEGIN_EXPORT md
+[![MELPA](https://melpa.org/packages/clipetty-badge.svg)](https://melpa.org/#/clipetty)
+[![MELPA Stable](https://stable.melpa.org/packages/clipetty-badge.svg)](https://stable.melpa.org/#/clipetty)
 [![Build Status](https://github.com/spudlyo/clipetty/workflows/CI/badge.svg)](https://github.com/spudlyo/clipetty/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 #+END_EXPORT
@@ -25,6 +27,11 @@ functionality found in Emacs' [[https://github.com/emacs-mirror/emacs/blob/maste
 - Clipetty is [[#kitty][compatible]] with the Kitty terminal emulator
 
 ** Install
+The recommended way to get Clipetty is as a package from the [[https://melpa.org/#/clipetty][MELPA]] repository,
+which tracks the master branch of this repository and will almost always be
+up-to-date. There are also packages in MELPA Stable, which track the most recent
+[[https://github.com/spudlyo/clipetty/releases][stable release]].
+
 If you want Clipetty to work everywhere, you can enable =global-clipetty-mode=,
 otherwise you can enable =clipetty-mode= on a buffer-by-buffer basis.
 
@@ -37,8 +44,9 @@ If you're using =use-package= you can add this to your =init.el= file:
 #+END_SRC
 
 *** Manual
-If you manually installed =clipetty.el= somewhere on your =load-path= you can
-add:
+You can manually install Clipetty from MELPA with =M-x package-install RET
+clipetty RET=. Afterwards you can add the following to your =init.el= file:
+
 #+BEGIN_SRC
 (require 'clipetty)
 (global-clipetty-mode)

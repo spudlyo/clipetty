@@ -1,5 +1,7 @@
 # Clipetty
 
+[![MELPA](https://melpa.org/packages/clipetty-badge.svg)](https://melpa.org/#/clipetty)
+[![MELPA Stable](https://stable.melpa.org/packages/clipetty-badge.svg)](https://stable.melpa.org/#/clipetty)
 [![Build Status](https://github.com/spudlyo/clipetty/workflows/CI/badge.svg)](https://github.com/spudlyo/clipetty/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
@@ -20,6 +22,8 @@ Here are some reasons why you might want to use Clipetty instead of the native f
 
 ## Install
 
+The recommended way to get Clipetty is as a package from the [MELPA](https://melpa.org/#/clipetty) repository, which tracks the master branch of this repository and will almost always be up-to-date. There are also packages in MELPA Stable, which track the most recent [stable release](https://github.com/spudlyo/clipetty/releases).
+
 If you want Clipetty to work everywhere, you can enable `global-clipetty-mode`, otherwise you can enable `clipetty-mode` on a buffer-by-buffer basis.
 
 
@@ -36,7 +40,7 @@ If you're using `use-package` you can add this to your `init.el` file:
 
 ### Manual
 
-If you manually installed `clipetty.el` somewhere on your `load-path` you can add:
+You can manually install Clipetty from MELPA with `M-x package-install RET clipetty RET`. Afterwards you can add the following to your `init.el` file:
 
 ```
 (require 'clipetty)
