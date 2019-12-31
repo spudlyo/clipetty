@@ -1,17 +1,19 @@
 * How to Contribute
 Thanks for considering contributing to this project, it would be /amazing/ if that
-happened, and I'd be stoked to have help!
+happened, and I'd be stoked to have your help! Here are a few guidelines to help
+smooth out this process and to get your changes into Clipetty ASAP.
 
 ** Submit a Pull Request
 Fork the project on Github, commit your changes to your fork's master branch,
 and then submit a Pull Request. I'll take a look, and we'll have a conversation
-about your proposed changes in the PR.
-*** Tests
-**** Adding Them
+about your proposed changes in the PR. This is how most projects on Github work,
+and this one is no different.
+
+*** Adding Tests
 If your PR contains a non-trivial change or fixes a bug that the unit tests
 didn't catch, it'd be great if you were to add one or more unit tests to
 [[https://github.com/spudlyo/clipetty/blob/master/test/clipetty-test.el][clipetty-test.el]].
-**** Passing Them
+*** Passing Tests
 The script [[https://github.com/spudlyo/clipetty/blob/master/run-tests.sh][run-tests.sh]] is used by the CI workflow to make sure commits to
 master or new pull requests pass all the existing tests, including:
 
