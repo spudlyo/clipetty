@@ -33,7 +33,7 @@
 
 (require 'ert)
 
-(ert-deftest clipetty-test-get-tmux-ssh-tty ()
+(ert-deftest clipetty-test-clipetty--get-tmux-ssh-tty ()
   "Test the `clipetty--get-tmux-ssh-tty' function."
   (let ((clipetty-tmux-ssh-tty "not-a-valid-command"))
     (should (equal (clipetty--get-tmux-ssh-tty) nil)))
