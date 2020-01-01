@@ -33,65 +33,65 @@
 
 (require 'ert)
 
-(ert-deftest clipetty-test-get-tmux-ssh-tty ()
-  "Test the `clipetty-get-tmux-ssh-tty' function."
+(ert-deftest clipetty-test-clipetty--get-tmux-ssh-tty ()
+  "Test the `clipetty--get-tmux-ssh-tty' function."
   (let ((clipetty-tmux-ssh-tty "not-a-valid-command"))
-    (should (equal (clipetty-get-tmux-ssh-tty) nil)))
+    (should (equal (clipetty--get-tmux-ssh-tty) nil)))
   (let ((clipetty-tmux-ssh-tty "echo SSH_TTY=foo"))
-    (should (equal (clipetty-get-tmux-ssh-tty) "foo")))
+    (should (equal (clipetty--get-tmux-ssh-tty) "foo")))
   (let ((clipetty-tmux-ssh-tty "echo NOPE_TTY=foo"))
-  (should (equal (clipetty-get-tmux-ssh-tty) nil)))
+  (should (equal (clipetty--get-tmux-ssh-tty) nil)))
   (let ((clipetty-tmux-ssh-tty "echo GOOB=bar")
         (clipetty-tmux-ssh-tty-regexp "GOOB=\\([^\n]+\\)"))
-    (should (equal (clipetty-get-tmux-ssh-tty) "bar"))))
+    (should (equal (clipetty--get-tmux-ssh-tty) "bar"))))
 
-(ert-deftest clipetty-test-clipetty-tty ()
-  "Test the `clipetty-tty' function."
-  (should (equal (clipetty-tty nil nil) (terminal-name)))
+(ert-deftest clipetty-test-clipetty--tty ()
+  "Test the `clipetty--tty' function."
+  (should (equal (clipetty--tty nil nil) (terminal-name)))
   (let ((clipetty-tmux-ssh-tty "echo SSH_TTY=from-tmux"))
-    (should (equal (clipetty-tty "/dev/tty" t) "from-tmux")))
+    (should (equal (clipetty--tty "/dev/tty" t) "from-tmux")))
   (let ((clipetty-tmux-ssh-tty "echo NOPE"))
-    (should (equal (clipetty-tty "from-ssh-tty" t) "from-ssh-tty")))
-  (should (equal (clipetty-tty "from-ssh-tty" nil) "from-ssh-tty")))
+    (should (equal (clipetty--tty "from-ssh-tty" t) "from-ssh-tty")))
+  (should (equal (clipetty--tty "from-ssh-tty" nil) "from-ssh-tty")))
 
-(ert-deftest clipetty-test-clipetty-make-dcs ()
-  "Test the `clipetty-make-dcs' function."
-  (let ((tmux-dcs   (concat clipetty-tmux-dcs-start "foo" clipetty-dcs-end))
-        (screen-dcs (concat clipetty-screen-dcs-start "foo" clipetty-dcs-end)))
-    (should (equal (clipetty-make-dcs "foo") tmux-dcs))
-    (should (equal (clipetty-make-dcs "foo" nil) tmux-dcs))
-    (should (equal (clipetty-make-dcs "foo" t) screen-dcs))))
+(ert-deftest clipetty-test-clipetty--make-dcs ()
+  "Test the `clipetty--make-dcs' function."
+  (let ((tmux-dcs   (concat clipetty--tmux-dcs-start "foo" clipetty--dcs-end))
+        (screen-dcs (concat clipetty--screen-dcs-start "foo" clipetty--dcs-end)))
+    (should (equal (clipetty--make-dcs "foo") tmux-dcs))
+    (should (equal (clipetty--make-dcs "foo" nil) tmux-dcs))
+    (should (equal (clipetty--make-dcs "foo" t) screen-dcs))))
 
-(ert-deftest clipetty-test-clipetty-dcs-wrap ()
-  "Test the `clipetty-dcs-wrap' function."
-  (let ((tmux-dcs   (concat clipetty-tmux-dcs-start "foo" clipetty-dcs-end))
-        (screen-dcs (concat clipetty-screen-dcs-start "foo" clipetty-dcs-end)))
+(ert-deftest clipetty-test-clipetty--dcs-wrap ()
+  "Test the `clipetty--dcs-wrap' function."
+  (let ((tmux-dcs   (concat clipetty--tmux-dcs-start "foo" clipetty--dcs-end))
+        (screen-dcs (concat clipetty--screen-dcs-start "foo" clipetty--dcs-end)))
     ;; no screen or tmux indicators
-    (should (equal (clipetty-dcs-wrap "foo" nil nil nil) "foo"))
-    (should (equal (clipetty-dcs-wrap "foo" nil nil t) "foo"))
+    (should (equal (clipetty--dcs-wrap "foo" nil nil nil) "foo"))
+    (should (equal (clipetty--dcs-wrap "foo" nil nil t) "foo"))
     (let ((clipetty-assume-nested-mux t))
-      (should (equal (clipetty-dcs-wrap "foo" nil nil t) "foo")))
+      (should (equal (clipetty--dcs-wrap "foo" nil nil t) "foo")))
     ;; tmux indicated
-    (should (equal (clipetty-dcs-wrap "foo" t nil nil) tmux-dcs))
-    (should (equal (clipetty-dcs-wrap "foo" t nil t) "foo"))
+    (should (equal (clipetty--dcs-wrap "foo" t nil nil) tmux-dcs))
+    (should (equal (clipetty--dcs-wrap "foo" t nil t) "foo"))
     (let ((clipetty-assume-nested-mux t))
-      (should (equal (clipetty-dcs-wrap "foo" t nil t) tmux-dcs)))
+      (should (equal (clipetty--dcs-wrap "foo" t nil t) tmux-dcs)))
     ;; screen indicated
     (let ((clipetty-screen-regexp "screen"))
-      (should (equal (clipetty-dcs-wrap "foo" nil "xscreen" nil) screen-dcs)))
-    (should (equal (clipetty-dcs-wrap "foo" nil "xscreen" nil) "foo"))
-    (should (equal (clipetty-dcs-wrap "foo" nil "screen" nil) screen-dcs))
-    (should (equal (clipetty-dcs-wrap "foo" nil "screen" t) "foo"))
+      (should (equal (clipetty--dcs-wrap "foo" nil "xscreen" nil) screen-dcs)))
+    (should (equal (clipetty--dcs-wrap "foo" nil "xscreen" nil) "foo"))
+    (should (equal (clipetty--dcs-wrap "foo" nil "screen" nil) screen-dcs))
+    (should (equal (clipetty--dcs-wrap "foo" nil "screen" t) "foo"))
     (let ((clipetty-assume-nested-mux t))
-      (should (equal (clipetty-dcs-wrap "foo" nil "screen" t) screen-dcs)))))
+      (should (equal (clipetty--dcs-wrap "foo" nil "screen" t) screen-dcs)))))
 
-(ert-deftest clipetty-test-clipetty-osc ()
-  "Test the `clipetty-osc' function."
+(ert-deftest clipetty-test-clipetty--osc ()
+  "Test the `clipetty--osc' function."
   (let* ((bin      (base64-encode-string (encode-coding-string "foo" 'binary)))
-         (osc-bin  (concat clipetty-osc-start bin clipetty-osc-end))
-         (osc-foo  (concat clipetty-osc-start "foo" clipetty-osc-end)))
-    (should (equal (clipetty-osc "foo") osc-foo))
-    (should (equal (clipetty-osc "foo" t) osc-bin))))
+         (osc-bin  (concat clipetty--osc-start bin clipetty--osc-end))
+         (osc-foo  (concat clipetty--osc-start "foo" clipetty--osc-end)))
+    (should (equal (clipetty--osc "foo") osc-foo))
+    (should (equal (clipetty--osc "foo" t) osc-bin))))
 
 (ert-deftest clipetty-test-clipetty-mode ()
   "Test the `clipetty-mode' function."
