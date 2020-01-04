@@ -157,15 +157,17 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
 
 (defun clipetty-cut (string)
   "If in a terminal frame, convert STRING to a series of OSC 52 messages."
-  (if (display-graphic-p)
-      (gui-select-text string)
+  (unless (display-graphic-p)
     ;; An exclamation mark is an invalid base64 string. This signals to the
     ;; Kitty terminal emulator to reset the clipboard.  Other terminals will
     ;; simply ignore this.
     ;;
     ;; TODO: Support longer than `clipetty--max-cut' length messages in Kitty.
     (clipetty--emit (clipetty--osc "!"))
-    (clipetty--emit (clipetty--osc string t))))
+    (clipetty--emit (clipetty--osc string t)))
+  ;; Always chain to the original cut function.
+  (when clipetty--orig-ic-function
+      (funcall clipetty--orig-ic-function string)))
 
 ;;;###autoload
 (define-minor-mode clipetty-mode
