@@ -1,12 +1,12 @@
 ;;; clipetty.el --- Send every kill from a TTY frame to the system clipboard -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019 Mike Hamrick
+;; Copyright (C) 2019-2020 Mike Hamrick
 
 ;; Author: Mike Hamrick <mikeh@muppetlabs.com>
 ;; Maintainer: Mike Hamrick <mikeh@muppetlabs.com>
 ;; Created: 25 Dec 2019
-;; Modified: 30 Dec 2029
-;; Version: 0.1
+;; Modified: 04 Jan 2020
+;; Version: 0.0.2
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: terminals convenience
 ;; URL: https://github.com/spudlyo/clipetty
