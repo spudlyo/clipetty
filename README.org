@@ -88,12 +88,20 @@ string into the system clipboard.
 :END:
 - [[https://invisible-island.net/xterm/ctlseqs/ctlseqs.txt][xterm]] (Unix -- Where OSC 52 escape sequences originated)
 - [[https://iterm2.com][iTerm2]] (macOS)
-- [[https://github.com/jwilm/alacritty][Alacritty]] (macOS, Linux, BSD, WIndows)
+- [[https://github.com/jwilm/alacritty][Alacritty]] (macOS, Linux, BSD, Windows)
 - [[https://sw.kovidgoyal.net/kitty/][kitty]] (macOS, Linux)
 - [[https://mintty.github.io/][mintty]] (Windows)
 - [[https://hterm.org][hterm]] (Javascript)
 This is not an exhaustive list, these are just the ones I know about. Submit a
 PR if you know of any I missed.
+
+*** Alacritty
+:PROPERTIES:
+:CUSTOM_ID: alacritty
+:END:
+Alacritty versions prior to 0.4.2 suffer from an [[https://github.com/alacritty/alacritty/issues/1002][issue]] that will cause any
+attempted copy of more than 765 bytes to fail to be inserted into the OS
+clipboard.
 
 *** Kitty
 :PROPERTIES:
