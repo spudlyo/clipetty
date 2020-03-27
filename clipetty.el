@@ -90,9 +90,6 @@ support base64 encoded strings of up to 74,994 bytes long.")
 (defconst clipetty--osc-end "\a"
   "The end OSC 52 escape sequence.")
 
-(defvar-local clipetty--orig-ic-function interprogram-cut-function
-  "Keep the original ICF to restore on `clipetty-off' function.")
-
 (defun clipetty--get-tmux-ssh-tty ()
   "Query tmux for its local SSH_TTY environment variable and return it.
 Return nil if tmux is unable to locate the environment variable"
@@ -153,8 +150,10 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
       (message "Selection too long to send to terminal %d" (length string))
       (sit-for 1))))
 
-(defun clipetty-cut (string)
-  "If in a terminal frame, convert STRING to a series of OSC 52 messages."
+(defun clipetty-cut (orig-fun string)
+  "If in a terminal frame, convert STRING to a series of OSC 52 messages.
+Since this is intended to be used with `add-function', ORIG-FUN is
+the original `interprogram-cut-function' that we're advising."
   (unless (display-graphic-p)
     ;; An exclamation mark is an invalid base64 string. This signals to the
     ;; Kitty terminal emulator to reset the clipboard.  Other terminals will
@@ -164,8 +163,7 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
     (clipetty--emit (clipetty--osc "!"))
     (clipetty--emit (clipetty--osc string t)))
   ;; Always chain to the original cut function.
-  (when clipetty--orig-ic-function
-      (funcall clipetty--orig-ic-function string)))
+  (funcall orig-fun string))
 
 ;;;###autoload
 (define-minor-mode clipetty-mode
@@ -173,12 +171,9 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
   :lighter " Clp"
   :init-value nil
   :global nil
-  (make-local-variable 'interprogram-cut-function)
   (if clipetty-mode
-      (when (not (eq interprogram-cut-function #'clipetty-cut))
-        (setq clipetty--orig-ic-function interprogram-cut-function
-              interprogram-cut-function #'clipetty-cut))
-    (setq interprogram-cut-function clipetty--orig-ic-function)))
+      (add-function :around (local 'interprogram-cut-function) #'clipetty-cut)
+    (remove-function (local 'interprogram-cut-function) #'clipetty-cut)))
 
 ;;;###autoload
 (define-globalized-minor-mode global-clipetty-mode
