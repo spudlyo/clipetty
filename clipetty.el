@@ -116,18 +116,20 @@ frame's environment."
 (defun clipetty--make-dcs (string &optional screen)
   "Return STRING, wrapped in a Tmux flavored Device Control String.
 Return STRING, wrapped in a GNU screen flavored DCS, if SCREEN is non-nil."
-  (let ((dcs-start clipetty--tmux-dcs-start))
-    (when screen (setq dcs-start clipetty--screen-dcs-start))
+  (let ((dcs-start (if screen
+		       clipetty--screen-dcs-start
+		     clipetty--tmux-dcs-start)))
     (concat dcs-start string clipetty--dcs-end)))
 
 (defun clipetty--dcs-wrap (string tmux term ssh-tty)
   "Return STRING wrapped in an appropriate DCS if necessary.
 The arguments TMUX, TERM, and SSH-TTY should come from the selected
 frame's environment."
-  (let ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
-        (dcs    string))
-    (cond (screen (setq dcs (clipetty--make-dcs string t)))
-          (tmux   (setq dcs (clipetty--make-dcs string))))
+  (let* ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
+         (dcs
+          (cond (screen (clipetty--make-dcs string t))
+                (tmux   (clipetty--make-dcs string))
+                (t      string))))
     (if ssh-tty (if clipetty-assume-nested-mux dcs string) dcs)))
 
 (defun clipetty--osc (string &optional encode)
