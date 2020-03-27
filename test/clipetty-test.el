@@ -93,20 +93,6 @@
     (should (equal (clipetty--osc "foo") osc-foo))
     (should (equal (clipetty--osc "foo" t) osc-bin))))
 
-(ert-deftest clipetty-test-clipetty-mode ()
-  "Test the `clipetty-mode' function."
-  (let ((old-icf interprogram-cut-function))
-    (should (and (clipetty-mode)
-                 (equal interprogram-cut-function #'clipetty-cut)))
-    (should (and (clipetty-mode 1)
-                 (equal interprogram-cut-function #'clipetty-cut)))
-    (should (and (clipetty-mode +1)
-                 (equal interprogram-cut-function #'clipetty-cut)))
-    (should (and (not (clipetty-mode 0))
-                 (equal interprogram-cut-function old-icf)))
-    (should (and (not (clipetty-mode -1))
-                 (equal interprogram-cut-function old-icf)))))
-
 ;;; Checkdoc test
 
 ;; This code originally came from Flycheck, modified for use in Clipetty.
