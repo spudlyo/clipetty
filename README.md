@@ -77,15 +77,14 @@ to `M-w` like so:
 
 ## How Clipetty Works
 
-Clipetty does its magic by assigning the `clipetty-cut` function to Emacs'
-`interprogram-cut-function` variable, which is what happens when you activate
-`clipetty-mode`. When the mode is active, every time you kill a line or region
-Clipetty gets sent the content that is destined for the kill ring. The
-`clipetty-cut` function takes this content, converts it to base64, wraps it in
-an [ANSI OSC](https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences) 52 escape sequence, and then sends it to your terminal. Terminal
-programs which support OSC 52 commands will react to this by stripping off the
-escape sequence, decoding the base64 content, and then inserting the resulting
-string into the system clipboard.
+Clipetty does its magic by hooking Emacs' `interprogram-cut-function`, which is
+what happens when you activate `clipetty-mode`. When the mode is active, every
+time you kill a line or region Clipetty gets sent the content that is destined
+for the kill ring. The `clipetty-cut` function takes this content, converts it to
+base64, wraps it in an [ANSI OSC](https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences) 52 escape sequence, and then sends it to your
+terminal. Terminal programs which support OSC 52 commands will react to this by
+stripping off the escape sequence, decoding the base64 content, and then
+inserting the resulting string into the system clipboard.
 
 
 <a id="terminals"></a>

@@ -48,35 +48,31 @@
 Nesting is the practice of running a terminal multiplexer inside
 a terminal multiplexer, which is what you'd be doing if you ran
 tmux both locally and on remote hosts you SSH into."
-  :type 'boolean
-  :group 'clipetty)
+  :type 'boolean)
 
 (defcustom clipetty-tmux-ssh-tty "tmux show-environment SSH_TTY"
   "The command we send to tmux to determine the SSH_TTY.
 This default assumes that tmux is on your PATH.  If tmux lives
 elsewhere for you, or it is named something else, you can change
 it here."
-  :type 'string
-  :group 'clipetty)
+  :type 'string)
 
 (defcustom clipetty-screen-regexp "^screen"
   "This regexp is matched against TERM to test for the presence of GNU screen.
 If you've configured GNU screen to use an unusual terminal type,
 you can change this regular expression so Clipetty will recognize
 when you're running in screen."
-  :type 'regexp
-  :group 'clipetty)
+  :type 'regexp)
 
 (defcustom clipetty-tmux-ssh-tty-regexp "^SSH_TTY=\\([^\n]+\\)"
   "This regexp is used to capture the SSH_TTY from output of tmux.
 Unless you're inventing a new method for determining the SSH_TTY, after
 a detach / re-attach it's unlikely you'll need to change this."
-  :type 'regexp
-  :group 'clipetty)
+  :type 'regexp)
 
 (defconst clipetty--max-cut 74994
   "The maximum length of a string you can send to the clipboard via OSC52.
-The max OSC 52 message is 10,000 bytes.  This means we can
+The max OSC 52 message is 100,000 bytes.  This means we can
 support base64 encoded strings of up to 74,994 bytes long.")
 
 (defconst clipetty--screen-dcs-start "\eP"
@@ -93,9 +89,6 @@ support base64 encoded strings of up to 74,994 bytes long.")
 
 (defconst clipetty--osc-end "\a"
   "The end OSC 52 escape sequence.")
-
-(defvar-local clipetty--orig-ic-function interprogram-cut-function
-  "Keep the original ICF to restore on `clipetty-off' function.")
 
 (defun clipetty--get-tmux-ssh-tty ()
   "Query tmux for its local SSH_TTY environment variable and return it.
@@ -120,18 +113,20 @@ frame's environment."
 (defun clipetty--make-dcs (string &optional screen)
   "Return STRING, wrapped in a Tmux flavored Device Control String.
 Return STRING, wrapped in a GNU screen flavored DCS, if SCREEN is non-nil."
-  (let ((dcs-start clipetty--tmux-dcs-start))
-    (when screen (setq dcs-start clipetty--screen-dcs-start))
+  (let ((dcs-start (if screen
+		       clipetty--screen-dcs-start
+		     clipetty--tmux-dcs-start)))
     (concat dcs-start string clipetty--dcs-end)))
 
 (defun clipetty--dcs-wrap (string tmux term ssh-tty)
   "Return STRING wrapped in an appropriate DCS if necessary.
 The arguments TMUX, TERM, and SSH-TTY should come from the selected
 frame's environment."
-  (let ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
-        (dcs    string))
-    (cond (screen (setq dcs (clipetty--make-dcs string t)))
-          (tmux   (setq dcs (clipetty--make-dcs string))))
+  (let* ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
+         (dcs
+          (cond (screen (clipetty--make-dcs string t))
+                (tmux   (clipetty--make-dcs string))
+                (t      string))))
     (if ssh-tty (if clipetty-assume-nested-mux dcs string) dcs)))
 
 (defun clipetty--osc (string &optional encode)
@@ -155,8 +150,10 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
       (message "Selection too long to send to terminal %d" (length string))
       (sit-for 1))))
 
-(defun clipetty-cut (string)
-  "If in a terminal frame, convert STRING to a series of OSC 52 messages."
+(defun clipetty-cut (orig-fun string)
+  "If in a terminal frame, convert STRING to a series of OSC 52 messages.
+Since this is intended to be used with `add-function', ORIG-FUN is
+the original `interprogram-cut-function' that we're advising."
   (unless (display-graphic-p)
     ;; An exclamation mark is an invalid base64 string. This signals to the
     ;; Kitty terminal emulator to reset the clipboard.  Other terminals will
@@ -166,28 +163,22 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
     (clipetty--emit (clipetty--osc "!"))
     (clipetty--emit (clipetty--osc string t)))
   ;; Always chain to the original cut function.
-  (when clipetty--orig-ic-function
-      (funcall clipetty--orig-ic-function string)))
+  (funcall orig-fun string))
 
 ;;;###autoload
 (define-minor-mode clipetty-mode
   "Minor mode to send every kill from a TTY frame to the system clipboard."
   :lighter " Clp"
-  :group 'clipetty
   :init-value nil
   :global nil
-  (make-local-variable 'interprogram-cut-function)
   (if clipetty-mode
-      (when (not (eq interprogram-cut-function #'clipetty-cut))
-        (setq clipetty--orig-ic-function interprogram-cut-function
-              interprogram-cut-function #'clipetty-cut))
-    (setq interprogram-cut-function clipetty--orig-ic-function)))
+      (add-function :around (local 'interprogram-cut-function) #'clipetty-cut)
+    (remove-function (local 'interprogram-cut-function) #'clipetty-cut)))
 
 ;;;###autoload
 (define-globalized-minor-mode global-clipetty-mode
   clipetty-mode
-  (lambda () (clipetty-mode +1))
-  :group 'clipetty)
+  (lambda () (clipetty-mode +1)))
 
 ;;;###autoload
 (defun clipetty-kill-ring-save ()
