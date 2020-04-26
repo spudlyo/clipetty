@@ -97,6 +97,8 @@ inserting the resulting string into the system clipboard.
 -   [kitty](https://sw.kovidgoyal.net/kitty/) (macOS, Linux)
 -   [mintty](https://mintty.github.io/) (Windows)
 -   [hterm](https://hterm.org) (Javascript)
+-   [st](https://st.suckless.org/) (Unix)
+-   [mlterm](https://sourceforge.net/projects/mlterm/) (Unix, Windows, macOS)
 
 This is not an exhaustive list, these are just the ones I know about. Submit a
 PR if you know of any I missed.

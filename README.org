@@ -91,6 +91,9 @@ inserting the resulting string into the system clipboard.
 - [[https://sw.kovidgoyal.net/kitty/][kitty]] (macOS, Linux)
 - [[https://mintty.github.io/][mintty]] (Windows)
 - [[https://hterm.org][hterm]] (Javascript)
+- [[https://st.suckless.org/][st]] (Unix)
+- [[https://sourceforge.net/projects/mlterm/][mlterm]] (Unix, Windows, macOS)
+
 This is not an exhaustive list, these are just the ones I know about. Submit a
 PR if you know of any I missed.
 
