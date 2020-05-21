@@ -145,7 +145,7 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
          (clipetty--dcs-wrap string tmux term ssh-tty)
          nil
          (clipetty--tty ssh-tty tmux)
-         t
+         nil
          0)
       (message "Selection too long to send to terminal %d" (length string))
       (sit-for 1))))
