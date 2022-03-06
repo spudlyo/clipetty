@@ -124,8 +124,8 @@ The arguments TMUX, TERM, and SSH-TTY should come from the selected
 frame's environment."
   (let* ((screen (if term (string-match-p clipetty-screen-regexp term) nil))
          (dcs
-          (cond (screen (clipetty--make-dcs string t))
-                (tmux   (clipetty--make-dcs string))
+          (cond (tmux   (clipetty--make-dcs string))
+                (screen (clipetty--make-dcs string t))
                 (t      string))))
     (if ssh-tty (if clipetty-assume-nested-mux dcs string) dcs)))
 
