@@ -137,9 +137,10 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
 
 (defun clipetty--emit (string)
   "Emit STRING, optionally wrapped in a DCS, to an appropriate tty."
-  (let ((tmux    (getenv "TMUX" (selected-frame)))
-        (term    (getenv "TERM" (selected-frame)))
-        (ssh-tty (getenv "SSH_TTY" (selected-frame))))
+  (let* ((tmux    (getenv "TMUX" (selected-frame)))
+         (term    (getenv "TERM" (selected-frame)))
+         (ssh-tty (if tmux (clipetty--get-tmux-ssh-tty)
+                    (getenv "SSH_TTY" (selected-frame)))))
     (if (<= (length string) clipetty--max-cut)
         (write-region
          (clipetty--dcs-wrap string tmux term ssh-tty)
