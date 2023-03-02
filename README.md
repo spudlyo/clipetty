@@ -99,6 +99,7 @@ inserting the resulting string into the system clipboard.
 -   [hterm](https://hterm.org) (Javascript)
 -   [st](https://st.suckless.org/) (Unix)
 -   [mlterm](https://sourceforge.net/projects/mlterm/) (Unix, Windows, macOS)
+-   [Windows Terminal](https://github.com/microsoft/terminal) (Windows)
 
 This is not an exhaustive list, these are just the ones I know about. Submit a
 PR if you know of any I missed.
