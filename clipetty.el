@@ -103,12 +103,13 @@ Return nil if tmux is unable to locate the environment variable"
   "Return which TTY we should send our OSC payload to.
 Both the SSH-TTY and TMUX arguments should come from the selected
 frame's environment."
-  (if (not ssh-tty)
-      (terminal-name)
-    (if tmux
-        (let ((tmux-ssh-tty (clipetty--get-tmux-ssh-tty)))
-          (if tmux-ssh-tty tmux-ssh-tty ssh-tty))
-      ssh-tty)))
+  (let ((terminal-name "/dev/tty"))
+   (if (not ssh-tty)
+       (terminal-name)
+     (if tmux
+         (let ((tmux-ssh-tty (clipetty--get-tmux-ssh-tty)))
+           (if tmux-ssh-tty tmux-ssh-tty terminal-name))
+       terminal-name))))
 
 (defun clipetty--make-dcs (string &optional screen)
   "Return STRING, wrapped in a Tmux flavored Device Control String.
@@ -141,14 +142,14 @@ Optionally base64 encode it first if you specify non-nil for ENCODE."
         (term    (getenv "TERM" (selected-frame)))
         (ssh-tty (getenv "SSH_TTY" (selected-frame))))
     (if (<= (length string) clipetty--max-cut)
-        (write-region
-         (clipetty--dcs-wrap string tmux term ssh-tty)
-         nil
-         (clipetty--tty ssh-tty tmux)
-         t
-         0)
-      (message "Selection too long to send to terminal %d" (length string))
-      (sit-for 1))))
+        (progn
+         (write-region
+          (clipetty--dcs-wrap string tmux term ssh-tty)
+          nil
+          (clipetty--tty ssh-tty tmux)
+          t
+          0)
+         (sit-for 0.1)))))
 
 (defun clipetty-cut (orig-fun string)
   "If in a terminal frame, convert STRING to a series of OSC 52 messages.
