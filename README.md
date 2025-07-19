@@ -95,6 +95,7 @@ inserting the resulting string into the system clipboard.
 -   [iTerm2](https://iterm2.com) (macOS)
 -   [Alacritty](https://github.com/jwilm/alacritty) (macOS, Linux, BSD, Windows)
 -   [kitty](https://sw.kovidgoyal.net/kitty/) (macOS, Linux)
+-   [Ghostty](https://ghostty.org) (macOS, Linux)
 -   [mintty](https://mintty.github.io/) (Windows)
 -   [hterm](https://hterm.org) (Javascript)
 -   [st](https://st.suckless.org/) (Unix)
